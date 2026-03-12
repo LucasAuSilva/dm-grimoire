@@ -2,9 +2,8 @@ import markdown
 
 from processing_md import preprocess, is_active
 from html_generator import (
-    fits_in_pages,
-    remove_empty_html_lists,
-    preview_page_html,
+    build_html,
+    remove_empty_html_lists
 )
 
 
@@ -27,7 +26,7 @@ def preview_html(md_files, config):
     title = config.get("title", "Preview")
     columns = int(config.get("columns", 1))
     font_size = int(config.get("font_size", 10))
-    ignored = config.get("ignore", [])
+    ignored = config.get("ignored", [])
     paper_size = config.get("paper_size", "BINDER")
 
     combined_md = ""
@@ -54,22 +53,8 @@ def preview_html(md_files, config):
     )
 
     html_body = remove_empty_html_lists(html_body)
-    html = preview_page_html(title, html_body, font_size, columns, paper_size)
-
-    if not fits_in_pages(html, 1):
-        return {
-            "error": "Font size too large for the selected paper size/page numbers"
-        }
+    html = build_html(title, html_body, font_size, columns, paper_size)
 
     return {
         "html": html
-    }
-
-    return {
-        "html": html,
-        "meta": {
-            "columns": columns,
-            "font_size": font_size,
-            "files_processed": len(md_files)
-        }
     }

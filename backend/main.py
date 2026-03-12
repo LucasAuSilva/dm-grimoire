@@ -1,6 +1,8 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Response
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from typing import List
+from weasyprint import HTML
 import json
 
 from engine import preview_html
@@ -18,6 +20,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class PdfRequest(BaseModel):
+    html: str
+    filename: str | None = "document.pdf"
+
+
+@app.post("/generate-pdf")
+async def generate_pdf(data: PdfRequest):
+    pdf_bytes = HTML(string=data.html).write_pdf()
+    headers = {
+        "Content-Disposition": f'attachment; filename="{data.filename}"'
+    }
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers=headers
+    )
 
 
 @app.post("/preview")
@@ -42,4 +63,10 @@ async def preview(
         })
 
     result = preview_html(md_files, config)
-    return result
+    pdf_bytes = HTML(string=result["html"]).write_pdf()
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf"
+    )
+
