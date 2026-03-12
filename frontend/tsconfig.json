@@ -6,6 +6,7 @@
   ],
   "compilerOptions": {
     /* Alias import */
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
