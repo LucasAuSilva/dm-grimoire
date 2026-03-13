@@ -20,13 +20,14 @@ A web app for converting Obsidian-flavored Markdown notes into clean, print-read
 ## Project Structure
 
 ```
-├── main.py              # FastAPI app — /preview and /generate-pdf endpoints
-├── engine.py            # Orchestrates markdown processing and HTML generation
-├── processing_md.py     # Markdown preprocessing (frontmatter, Obsidian links, sections)
-├── html_generator.py    # HTML/CSS template builder and PDF utilities
+├── backend/
+│   ├── main.py              # FastAPI app — /preview and /generate-pdf endpoints
+│   ├── engine.py            # Orchestrates markdown processing and HTML generation
+│   ├── processing_md.py     # Markdown preprocessing (frontmatter, Obsidian links, sections)
+│   └── html_generator.py    # HTML/CSS template builder and PDF utilities
 └── frontend/
-    ├── preview-page.tsx # PDF preview iframe component
-    └── properties.tsx   # Sidebar form — layout config and file upload
+    ├── preview-page.tsx     # PDF preview iframe component
+    └── properties.tsx       # Sidebar form — layout config and file upload
 ```
 
 ## Getting Started
