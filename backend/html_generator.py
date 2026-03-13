@@ -50,16 +50,22 @@ PAPER_SIZES = {
 }
 
 
-def build_html(title, body, font_size, columns, paper_size):
+def build_html(title, body, font_size, columns, paper_size, margin_left):
 
     column_css = ""
 
-    if columns == 2:
-        column_css = """
-        .columns {
-            column-count: 2;
+    margin_left_css = PAPER_SIZES[paper_size]["margin-left"]
+
+    if margin_left != "":
+        margin_left_css = str(margin_left) + "mm"
+
+    if columns >= 2:
+        column_css = f"""
+        .columns {{
+            column-count: {columns};
             column-gap: 10px;
-        }
+            column-fill: auto;
+        }}
         """
 
     css = f"""
@@ -67,7 +73,7 @@ def build_html(title, body, font_size, columns, paper_size):
         size: {PAPER_SIZES[paper_size]["size"]};
         margin-top: {PAPER_SIZES[paper_size]["margin-top"]};
         margin-bottom: {PAPER_SIZES[paper_size]["margin-bottom"]};
-        margin-left: {PAPER_SIZES[paper_size]["margin-left"]};
+        margin-left: {margin_left_css};
         margin-right: {PAPER_SIZES[paper_size]["margin-right"]};
     }}
 

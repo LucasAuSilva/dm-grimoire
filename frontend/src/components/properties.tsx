@@ -12,6 +12,8 @@ import { ButtonGroup } from './ui/button-group'
 import { IconPlus, IconX } from '@tabler/icons-react'
 import { Separator } from './ui/separator'
 import { Badge } from './ui/badge'
+import { Checkbox } from './ui/checkbox'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from './ui/input-group'
 
 
 interface PropertiesSideBarProps {
@@ -24,14 +26,21 @@ interface PreviewPDFFormData {
   fontSize: number
   columns: number
   files: FileList
+  useFileName: boolean
+  marginLeft: number
   ignored: {
+    value: string
+  }[]
+  tagsToInclude: {
     value: string
   }[]
 }
 
 export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
   const [loading, setLoading] = useState(false)
+  const [useFileNameChecked, setUseFileNameChecked] = useState(false)
   const [section, setSection] = useState('')
+  const [tag, setTag] = useState('')
 
   const { register, handleSubmit, control, formState: {} } = useForm<PreviewPDFFormData>({
     defaultValues: {
@@ -42,9 +51,14 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
     }
   })
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields: ignoredFields, append: appendIgnored, remove: removeIgnored } = useFieldArray({
     control,
     name: 'ignored'
+  })
+
+  const { fields: tagsFields, append: appendTags, remove: removeTags } = useFieldArray({
+    control,
+    name: 'tagsToInclude'
   })
 
   const generatePreview = async (data: PreviewPDFFormData) => {
@@ -62,7 +76,10 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
         columns: data.columns,
         font_size: data.fontSize,
         paper_size: data.paperSize,
-        ignored: data.ignored.flatMap(i => i.value.toLowerCase())
+        use_file_name: useFileNameChecked,
+        margin_left: data.marginLeft,
+        ignored: data.ignored.flatMap(i => i.value.toLowerCase()),
+        tags: data.tagsToInclude.flatMap(i => i.value.toLowerCase()),
       })
     )
 
@@ -96,12 +113,27 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
         <div className='flex flex-col gap-2'>
           <Label htmlFor="title">Title</Label>
           <Input id="title" {...register('title')} />
+
+          <div className='flex gap-1'>
+          <Checkbox
+            id='use-file-name'
+            checked={useFileNameChecked}
+            onCheckedChange={(value) => setUseFileNameChecked(value as any)}
+          />
+          <Label htmlFor="use-file-name">Use file name?</Label>
+          </div>
         </div>
         <div className='flex flex-col gap-2'>
           <Label htmlFor="fontSize">Font size</Label>
-          <Input id="fontSize" {...register('fontSize', {
-            valueAsNumber: true
-          })} />
+          <InputGroup>
+            <InputGroupInput id='fontSize' placeholder="0" {...register('fontSize', {
+                valueAsNumber: true
+              })}
+            />
+            <InputGroupAddon align="inline-end">
+              <InputGroupText>px</InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
         </div>
         <div className='flex flex-col gap-2'>
           <Label htmlFor="columns">Columns</Label>
@@ -109,7 +141,51 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
         </div>
         <div className='flex flex-col gap-2'>
           <Label htmlFor="marginLeft">Margin Left</Label>
-          <Input id="marginLeft" />
+          <InputGroup>
+            <InputGroupInput id='marginLeft' placeholder="0" {...register('marginLeft', {
+                valueAsNumber: true
+              })}
+            />
+            <InputGroupAddon align="inline-end">
+              <InputGroupText>mm</InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
+        <div className='flex flex-col gap-2'>
+          <Label htmlFor="tagsToInclude">Tags to include</Label>
+          <ButtonGroup className='w-full'>
+            <Input value={section} id="tagsToInclude" onChange={(e) => setTag(e.target.value)} />
+            <Button
+              variant='outline'
+              aria-label="Plus"
+              onClick={() => {
+                appendTags({
+                  value: tag
+                })
+                setTag('')
+              }}
+            >
+              <IconPlus />
+            </Button>
+          </ButtonGroup>
+          <ul className='flex gap-1'>
+            {tagsFields.map((i, idx) =>
+              <li>
+                <Badge variant='default'>
+                  <Button
+                    size='xs'
+                    className='p-0 cursor-pointer'
+                    onClick={
+                      () => removeTags(idx)
+                    }
+                  >
+                    {i.value}
+                    <IconX />
+                  </Button>
+                </Badge>
+              </li>
+            )}
+          </ul>
         </div>
         <div className='flex flex-col gap-2'>
           <Label htmlFor="ignoredSections">Ignored Sections</Label>
@@ -119,7 +195,7 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
               variant='outline'
               aria-label="Plus"
               onClick={() => {
-                append({
+                appendIgnored({
                   value: section
                 })
                 setSection('')
@@ -129,14 +205,14 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
             </Button>
           </ButtonGroup>
           <ul className='flex gap-1'>
-            {fields.map((i, idx) =>
+            {ignoredFields.map((i, idx) =>
               <li>
                 <Badge variant='default'>
                   <Button
                     size='xs'
                     className='p-0 cursor-pointer'
                     onClick={
-                      () => remove(idx)
+                      () => removeIgnored(idx)
                     }
                   >
                     {i.value}

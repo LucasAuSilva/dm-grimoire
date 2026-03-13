@@ -1,3 +1,4 @@
+
 import re
 
 
@@ -17,30 +18,27 @@ def preprocess(md, ignored=[]):
 
 
 def get_frontmatter(md):
-
     match = re.search(r"^---(.*?)---", md, re.S)
-
     if not match:
         return ""
 
     return match.group(1)
 
 
-def is_active(md):
+def is_active(md, tags=[]):
+
+    include_tags = ["active", *tags]
 
     frontmatter = get_frontmatter(md)
-
     if not frontmatter:
         return False
-
     tags_block = re.search(r"tags:\s*(.*?)(\n\S|$)", frontmatter, re.S)
 
     if not tags_block:
         return False
-
     tags = re.findall(r"-\s*(\w+)", tags_block.group(1))
 
-    return "active" in tags
+    return set(tags) & set(include_tags)
 
 
 def remove_frontmatter(md):
@@ -78,9 +76,7 @@ def remove_sections(md, ignored):
     skip = False
 
     for line in lines:
-
         heading = re.match(r"^#+\s*(.*)", line.lower())
-
         if heading:
             title = heading.group(1).strip()
 
@@ -89,7 +85,6 @@ def remove_sections(md, ignored):
                 continue
             else:
                 skip = False
-
         if not skip:
             result.append(line)
 

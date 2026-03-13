@@ -8,35 +8,25 @@ from html_generator import (
 
 
 def preview_html(md_files, config):
-    """
-    md_files: list of dicts
-        [
-            {"name": "npc1", "content": "...markdown..."},
-            {"name": "npc2", "content": "...markdown..."}
-        ]
-
-    config: {
-        title: str,
-        columns: int,
-        font_size: float,
-        ignore: list[str]
-    }
-    """
-
     title = config.get("title", "Preview")
     columns = int(config.get("columns", 1))
     font_size = int(config.get("font_size", 10))
     ignored = config.get("ignored", [])
+    tags = config.get("tags", [])
     paper_size = config.get("paper_size", "BINDER")
+    use_file_name = config.get("use_file_name", False)
+    margin_left = config.get("margin_left", "")
 
     combined_md = ""
 
+    print(use_file_name)
+
     for file in md_files:
         md = file["content"]
-        if not is_active(md) and len(md_files) != 1:
+        if not is_active(md, tags) and len(md_files) != 1:
             continue
 
-        if len(md_files) == 1:
+        if use_file_name:
             title = file["name"]
 
         md = preprocess(md, ignored)
@@ -53,7 +43,13 @@ def preview_html(md_files, config):
     )
 
     html_body = remove_empty_html_lists(html_body)
-    html = build_html(title, html_body, font_size, columns, paper_size)
+    html = build_html(
+        title,
+        html_body,
+        font_size,
+        columns,
+        paper_size,
+        margin_left)
 
     return {
         "html": html
