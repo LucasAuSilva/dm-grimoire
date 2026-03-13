@@ -154,7 +154,7 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
         <div className='flex flex-col gap-2'>
           <Label htmlFor="tagsToInclude">Tags to include</Label>
           <ButtonGroup className='w-full'>
-            <Input value={section} id="tagsToInclude" onChange={(e) => setTag(e.target.value)} />
+            <Input value={tag} id="tagsToInclude" onChange={(e) => setTag(e.target.value)} />
             <Button
               variant='outline'
               aria-label="Plus"

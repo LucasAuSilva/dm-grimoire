@@ -56,7 +56,7 @@ def build_html(title, body, font_size, columns, paper_size, margin_left):
 
     margin_left_css = PAPER_SIZES[paper_size]["margin-left"]
 
-    if margin_left != "":
+    if margin_left is not None:
         margin_left_css = str(margin_left) + "mm"
 
     if columns >= 2:
@@ -106,6 +106,11 @@ def build_html(title, body, font_size, columns, paper_size, margin_left):
     p {{
         margin-top: 2px;
         margin-bottom: 4px;
+    }}
+
+    ul {{
+        padding-left: 8px;
+        list-style-position: inside;
     }}
 
     li {{

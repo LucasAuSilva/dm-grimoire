@@ -19,8 +19,6 @@ def preview_html(md_files, config):
 
     combined_md = ""
 
-    print(use_file_name)
-
     for file in md_files:
         md = file["content"]
         if not is_active(md, tags) and len(md_files) != 1:
@@ -43,6 +41,7 @@ def preview_html(md_files, config):
     )
 
     html_body = remove_empty_html_lists(html_body)
+    print(html_body)
     html = build_html(
         title,
         html_body,
