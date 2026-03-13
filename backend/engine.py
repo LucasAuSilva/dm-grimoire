@@ -41,7 +41,6 @@ def preview_html(md_files, config):
     )
 
     html_body = remove_empty_html_lists(html_body)
-    print(html_body)
     html = build_html(
         title,
         html_body,

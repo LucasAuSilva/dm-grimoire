@@ -14,10 +14,15 @@ import { Separator } from './ui/separator'
 import { Badge } from './ui/badge'
 import { Checkbox } from './ui/checkbox'
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from './ui/input-group'
+import { useLoadingContext } from '@/context/loading-context'
 
 
 interface PropertiesSideBarProps {
   setPreview: React.Dispatch<React.SetStateAction<string>>
+  formRefs: {
+      formRef: React.RefObject<HTMLFormElement | null>;
+      fileInputRef: React.RefObject<HTMLInputElement | null>;
+  }
 }
 
 interface PreviewPDFFormData {
@@ -36,8 +41,8 @@ interface PreviewPDFFormData {
   }[]
 }
 
-export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
-  const [loading, setLoading] = useState(false)
+export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRef } }: PropertiesSideBarProps) {
+  const { isLoading, updateLoading } = useLoadingContext();
   const [useFileNameChecked, setUseFileNameChecked] = useState(false)
   const [section, setSection] = useState('')
   const [tag, setTag] = useState('')
@@ -50,6 +55,8 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
       paperSize: 'A4'
     }
   })
+
+  const { ref: registerRef, ...fileRegisterRest } = register('files')
 
   const { fields: ignoredFields, append: appendIgnored, remove: removeIgnored } = useFieldArray({
     control,
@@ -83,7 +90,7 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
       })
     )
 
-    setLoading(true)
+    updateLoading(true)
 
     try {
       const res = await axios.post(
@@ -104,11 +111,17 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
       console.error(err)
     }
 
-    setLoading(false)
+    updateLoading(false)
   }
 
   return (
-    <form onSubmit={handleSubmit(generatePreview)} className='flex flex-col gap-2'>
+    <form
+      onSubmit={handleSubmit(generatePreview)}
+      className='flex flex-col gap-2'
+      ref={(e) => {
+        if (formRef) (formRef as React.RefObject<HTMLFormElement | null>).current = e
+      }}
+    >
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col gap-2'>
           <Label htmlFor="title">Title</Label>
@@ -258,14 +271,18 @@ export function PropertiesSideBar({ setPreview }: PropertiesSideBarProps) {
           type="file"
           multiple
           accept=".md"
-          {...register('files')}
+          {...fileRegisterRest}
+          ref={(e) => {
+            registerRef(e)
+            if (fileInputRef) (fileInputRef as React.RefObject<HTMLInputElement | null>).current = e
+          }}
         />
       </div>
 
       <Separator className='my-4' />
 
       <Button type='submit'>
-        {loading ? "Loading..." : "Generate PDF"}
+        {isLoading ? "Loading..." : "Generate PDF"}
       </Button>
     </form>
   )
