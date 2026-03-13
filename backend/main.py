@@ -11,6 +11,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",  # Vite dev server
+    "http://localhost:3000",  # Vite Docker
 ]
 
 app.add_middleware(
