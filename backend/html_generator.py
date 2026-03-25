@@ -1,6 +1,7 @@
 import re
 import tempfile
 
+from models import HtmlBuildConfig
 from weasyprint import HTML
 from pypdf import PdfReader
 
@@ -50,59 +51,57 @@ PAPER_SIZES = {
 }
 
 
-def build_html(title, body, font_size, columns, paper_size, margin_left):
+def build_html(html: HtmlBuildConfig):
 
     column_css = ""
 
-    margin_left_css = PAPER_SIZES[paper_size]["margin-left"]
+    margin_left_css = PAPER_SIZES[html.paper_size]["margin-left"]
 
-    if margin_left is not None:
-        margin_left_css = str(margin_left) + "mm"
+    if html.margin_left is not None:
+        margin_left_css = str(html.margin_left) + "mm"
 
-    if columns >= 2:
+    if html.columns >= 2:
         column_css = f"""
         .columns {{
-            column-count: {columns};
+            column-count: {html.columns};
             column-gap: 10px;
             column-fill: auto;
         }}
         """
 
-    print("font_size: ", font_size)
-
     css = f"""
     @page {{
-        size: {PAPER_SIZES[paper_size]["size"]};
-        margin-top: {PAPER_SIZES[paper_size]["margin-top"]};
-        margin-bottom: {PAPER_SIZES[paper_size]["margin-bottom"]};
+        size: {PAPER_SIZES[html.paper_size]["size"]};
+        margin-top: {PAPER_SIZES[html.paper_size]["margin-top"]};
+        margin-bottom: {PAPER_SIZES[html.paper_size]["margin-bottom"]};
         margin-left: {margin_left_css};
-        margin-right: {PAPER_SIZES[paper_size]["margin-right"]};
+        margin-right: {PAPER_SIZES[html.paper_size]["margin-right"]};
     }}
 
     body {{
-        font-family: Georgia, serif;
-        font-size: {font_size}pt;
+        font-family: "EB Garamond", Georgia, serif;
+        font-size: {html.font_size}pt;
         line-height: 1.15;
         font-stretch: condensed;
-        letter-spacing: -0.4pt;
+        letter-spacing: {html.letter_spacing}pt;
     }}
 
     h1 {{
-        font-size: {font_size + 2}pt;
+        font-size: {html.font_size + 2}pt;
         text-align: center;
         border-bottom: 2px solid black;
         margin-bottom: 4px;
     }}
 
     h2 {{
-        font-size: {font_size + 0.6}pt;
+        font-size: {html.font_size + 0.6}pt;
         font-variant: small-caps;
         border-bottom: 1px solid #444;
         margin-top: 3px;
     }}
 
     h3 {{
-        font-size: {font_size + 0.3}pt;
+        font-size: {html.font_size + 0.3}pt;
         font-variant: small-caps;
         margin-top: 3px;
     }}
@@ -139,10 +138,10 @@ def build_html(title, body, font_size, columns, paper_size, margin_left):
 
 <body>
 
-<h1>{title}</h1>
+<h1>{html.title}</h1>
 
 <div class="columns">
-{body}
+{html.body}
 </div>
 
 </body>

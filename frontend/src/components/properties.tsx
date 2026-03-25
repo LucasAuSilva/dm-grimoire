@@ -83,6 +83,7 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
         title: data.title ?? "Preview",
         columns: data.columns,
         font_size: data.fontSize,
+        letter_spacing: data.letterSpacing,
         paper_size: data.paperSize,
         use_file_name: useFileNameChecked,
         margin_left: data.marginLeft,

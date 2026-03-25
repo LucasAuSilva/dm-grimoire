@@ -1,5 +1,6 @@
 import markdown
 
+from models import PreviewConfig, HtmlBuildConfig
 from processing_md import preprocess, is_active
 from html_generator import (
     build_html,
@@ -7,27 +8,20 @@ from html_generator import (
 )
 
 
-def preview_html(md_files, config):
-    title = config.get("title", "Preview")
-    columns = int(config.get("columns", 1))
-    font_size = float(config.get("font_size", 10))
-    ignored = config.get("ignored", [])
-    tags = config.get("tags", [])
-    paper_size = config.get("paper_size", "BINDER")
-    use_file_name = config.get("use_file_name", False)
-    margin_left = config.get("margin_left", "")
-
+def preview_html(md_files, config: PreviewConfig):
     combined_md = ""
+
+    title = config.title
 
     for file in md_files:
         md = file["content"]
-        if not is_active(md, tags) and len(md_files) != 1:
+        if not is_active(md, config.tags) and len(md_files) != 1:
             continue
 
-        if use_file_name:
+        if config.use_file_name:
             title = file["name"]
 
-        md = preprocess(md, ignored)
+        md = preprocess(md, config.ignored)
 
         if len(md_files) > 1:
             name = file["name"]
@@ -45,13 +39,15 @@ def preview_html(md_files, config):
     html_body = html_body.replace("<li>☐", '<li class="checkbox">☐')
     html_body = html_body.replace("<li>☑", '<li class="checkbox">☑')
 
-    html = build_html(
-        title,
-        html_body,
-        font_size,
-        columns,
-        paper_size,
-        margin_left)
+    html = build_html(HtmlBuildConfig(
+        title=title,
+        body=html_body,
+        font_size=config.font_size,
+        letter_spacing=config.letter_spacing,
+        columns=config.columns,
+        paper_size=config.paper_size,
+        margin_left=config.margin_left
+    ))
 
     return {
         "html": html

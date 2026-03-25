@@ -27,6 +27,10 @@ RUN uv pip install --system .
 # Copy the rest of the application
 COPY . .
 
+## Copying fonts and adding them to container
+RUN mkdir -p /usr/local/share/fonts/custom
+RUN cp fonts/*.ttf /usr/local/share/fonts/custom/ && fc-cache -fv
+
 EXPOSE 8000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

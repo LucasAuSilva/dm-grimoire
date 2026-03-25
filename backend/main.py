@@ -1,10 +1,9 @@
 from fastapi import FastAPI, UploadFile, File, Form, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List
 from weasyprint import HTML
 import json
 
+from models import PreviewConfig, PdfRequest
 from engine import preview_html
 
 app = FastAPI()
@@ -23,11 +22,6 @@ app.add_middleware(
 )
 
 
-class PdfRequest(BaseModel):
-    html: str
-    filename: str | None = "document.pdf"
-
-
 @app.post("/generate-pdf")
 async def generate_pdf(data: PdfRequest):
     pdf_bytes = HTML(string=data.html).write_pdf()
@@ -44,7 +38,7 @@ async def generate_pdf(data: PdfRequest):
 
 @app.post("/preview")
 async def preview(
-    files: List[UploadFile] = File(...),
+    files: list[UploadFile] = File(...),
     config: str = Form(...)
 ):
     """
@@ -52,7 +46,8 @@ async def preview(
     config: JSON string with preview configuration
     """
 
-    config = json.loads(config)
+    parsed = json.loads(config)
+    preview_config = PreviewConfig(**parsed)
     md_files = []
 
     for file in files:
@@ -63,7 +58,7 @@ async def preview(
             "content": content
         })
 
-    result = preview_html(md_files, config)
+    result = preview_html(md_files, preview_config)
     pdf_bytes = HTML(string=result["html"]).write_pdf()
 
     return Response(
