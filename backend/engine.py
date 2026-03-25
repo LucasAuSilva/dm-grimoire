@@ -43,10 +43,12 @@ def preview_html(md_files, config: PreviewConfig):
         title=title,
         body=html_body,
         font_size=config.font_size,
+        font_family=config.font_family,
         letter_spacing=config.letter_spacing,
         columns=config.columns,
         paper_size=config.paper_size,
-        margin_left=config.margin_left
+        margin_left=config.margin_left,
+        margin_right=config.margin_right
     ))
 
     return {

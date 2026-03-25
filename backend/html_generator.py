@@ -29,7 +29,7 @@ PAPER_SIZES = {
     },
     "A5": {
         "size": "148mm 210mm",
-        "margin-top": "3mm",
+        "margin-top": "4mm",
         "margin-bottom": "8mm",
         "margin-left": "6mm",
         "margin-right": "6mm"
@@ -41,13 +41,6 @@ PAPER_SIZES = {
         "margin-left": "4mm",
         "margin-right": "4mm"
     },
-    "BINDER": {
-        "size": "200mm 275mm",
-        "margin-top": "8mm",
-        "margin-bottom": "8mm",
-        "margin-left": "12mm",
-        "margin-right": "8mm"
-    }
 }
 
 
@@ -56,9 +49,12 @@ def build_html(html: HtmlBuildConfig):
     column_css = ""
 
     margin_left_css = PAPER_SIZES[html.paper_size]["margin-left"]
+    margin_right_css = PAPER_SIZES[html.paper_size]["margin-right"]
 
     if html.margin_left is not None:
         margin_left_css = str(html.margin_left) + "mm"
+    if html.margin_right is not None:
+        margin_right_css = str(html.margin_right) + "mm"
 
     if html.columns >= 2:
         column_css = f"""
@@ -75,11 +71,11 @@ def build_html(html: HtmlBuildConfig):
         margin-top: {PAPER_SIZES[html.paper_size]["margin-top"]};
         margin-bottom: {PAPER_SIZES[html.paper_size]["margin-bottom"]};
         margin-left: {margin_left_css};
-        margin-right: {PAPER_SIZES[html.paper_size]["margin-right"]};
+        margin-right: {margin_right_css};
     }}
 
     body {{
-        font-family: "EB Garamond", Georgia, serif;
+        font-family: "{html.font_family}", Georgia, serif;
         font-size: {html.font_size}pt;
         line-height: 1.15;
         font-stretch: condensed;

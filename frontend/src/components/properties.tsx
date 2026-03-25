@@ -28,12 +28,14 @@ interface PropertiesSideBarProps {
 interface PreviewPDFFormData {
   title?: string
   paperSize: string
+  fontFamily: string
   fontSize: number
   letterSpacing: number
   columns: number
   files: FileList
   useFileName: boolean
   marginLeft: number
+  marginRight: number
   ignored: {
     value: string
   }[]
@@ -48,11 +50,12 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
   const [section, setSection] = useState('')
   const [tag, setTag] = useState('')
 
-  const { register, handleSubmit, control, formState: {} } = useForm<PreviewPDFFormData>({
+  const { register, handleSubmit, control, formState: {}, setValue } = useForm<PreviewPDFFormData>({
     defaultValues: {
       title: "Preview",
       columns: 2,
       fontSize: 10,
+      letterSpacing: 0,
       paperSize: 'A4'
     }
   })
@@ -76,16 +79,17 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
       formData.append("files", file)
     })
 
-    // required by your FastAPI endpoint
     formData.append(
       "config",
       JSON.stringify({
         title: data.title ?? "Preview",
         columns: data.columns,
+        font_family: data.fontFamily,
         font_size: data.fontSize,
         letter_spacing: data.letterSpacing,
         paper_size: data.paperSize,
         use_file_name: useFileNameChecked,
+        margin_right: data.marginRight,
         margin_left: data.marginLeft,
         ignored: data.ignored.flatMap(i => i.value.toLowerCase()),
         tags: data.tagsToInclude.flatMap(i => i.value.toLowerCase()),
@@ -169,16 +173,33 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
           <Input id="columns" {...register('columns')} />
         </div>
         <div className='flex flex-col gap-2'>
-          <Label htmlFor="marginLeft">Margin Left</Label>
-          <InputGroup>
-            <InputGroupInput id='marginLeft' placeholder="0" {...register('marginLeft', {
-                valueAsNumber: true
-              })}
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupText>mm</InputGroupText>
-            </InputGroupAddon>
-          </InputGroup>
+          <Label>Margins</Label>
+          <div className='flex gap-1'>
+            <div className='flex flex-1 flex-col gap-2'>
+              <Label htmlFor="marginLeft">Left</Label>
+              <InputGroup>
+                <InputGroupInput id='marginLeft' placeholder="0" {...register('marginLeft', {
+                    valueAsNumber: true
+                  })}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>mm</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+            <div className='flex flex-1 flex-col gap-2'>
+              <Label htmlFor="marginRight">Right</Label>
+              <InputGroup>
+                <InputGroupInput id='marginRight' placeholder="0" {...register('marginRight', {
+                    valueAsNumber: true
+                  })}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>mm</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+          </div>
         </div>
         <div className='flex flex-col gap-2'>
           <Label htmlFor="tagsToInclude">Tags to include</Label>
@@ -256,29 +277,52 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
             )}
           </ul>
         </div>
-        <div className='flex flex-col gap-2'>
-          <Label htmlFor="paperSize">Paper Type</Label>
-          <Controller
-            name="paperSize"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={(value) => {
-                field.onChange(value)
-              }}>
-                <SelectTrigger className="w-full">
-                  <SelectValue defaultValue='A4' placeholder="Type of paper" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="A4">A4</SelectItem>
-                    <SelectItem value="A5">A5</SelectItem>
-                    <SelectItem value="A6">A6</SelectItem>
-                    <SelectItem value="BINDER">Binder</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
+        <div className='flex gap-2'>
+          <div className='flex flex-1 flex-col gap-2'>
+            <Label htmlFor="paperSize">Paper Type</Label>
+            <Controller
+              name="paperSize"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={(value) => {
+                  field.onChange(value)
+                  setValue('marginTop', 6)
+                }}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue defaultValue='A4' placeholder="Type of paper" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="A4">A4</SelectItem>
+                      <SelectItem value="A5">A5</SelectItem>
+                      <SelectItem value="A6">A6</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <div className='flex flex-1 flex-col gap-2'>
+            <Label htmlFor="fontFamily">Font</Label>
+            <Controller
+              name="fontFamily"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue defaultValue='EB Garamond' placeholder="Select font" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="EB Garamond">EB Garamond</SelectItem>
+                      <SelectItem value="Crimson Text">Crimson Text</SelectItem>
+                      <SelectItem value="CMU Serif">Computer Modern</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
         </div>
       </div>
 
