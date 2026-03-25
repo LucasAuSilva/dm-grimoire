@@ -1,36 +1,34 @@
 FROM python:3.12-slim
 
-# Install system dependencies required by WeasyPrint
-RUN apt-get update && apt-get install -y \
-    build-essential \
+# Install ONLY runtime dependencies — no build-essential
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangoft2-1.0-0 \
     libcairo2 \
-    libffi-dev \
     libglib2.0-0 \
     libgdk-pixbuf-2.0-0 \
     fonts-liberation \
-    && rm -rf /var/lib/apt/lists/*
+    fontconfig \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /app
 
-# Copy dependency files
-COPY pyproject.toml ./
-COPY uv.lock ./
+# Install uv first (cached layer — only reruns if this line changes)
+RUN pip install --no-cache-dir uv
 
-# Install uv
-RUN pip install uv
+# Copy ONLY dependency files first (cached layer — only reruns if deps change)
+COPY pyproject.toml uv.lock ./
 
 # Install Python dependencies
-RUN uv pip install --system .
+RUN uv pip install --system --no-cache .
 
-# Copy the rest of the application
+# Copy fonts and register them
+COPY fonts/ /usr/local/share/fonts/custom/
+RUN fc-cache -fv
+
+# Copy app code LAST (this layer changes most often)
 COPY . .
 
-## Copying fonts and adding them to container
-RUN mkdir -p /usr/local/share/fonts/custom
-RUN cp fonts/*.ttf /usr/local/share/fonts/custom/ && fc-cache -fv
-
 EXPOSE 8000
-
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
