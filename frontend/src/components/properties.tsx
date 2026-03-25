@@ -50,7 +50,7 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
   const [section, setSection] = useState('')
   const [tag, setTag] = useState('')
 
-  const { register, handleSubmit, control, formState: {}, setValue } = useForm<PreviewPDFFormData>({
+  const { register, handleSubmit, control, formState: {} } = useForm<PreviewPDFFormData>({
     defaultValues: {
       title: "Preview",
       columns: 2,
@@ -286,7 +286,6 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
               render={({ field }) => (
                 <Select value={field.value} onValueChange={(value) => {
                   field.onChange(value)
-                  setValue('marginTop', 6)
                 }}>
                   <SelectTrigger className="w-full">
                     <SelectValue defaultValue='A4' placeholder="Type of paper" />
