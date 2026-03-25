@@ -29,6 +29,7 @@ interface PreviewPDFFormData {
   title?: string
   paperSize: string
   fontSize: number
+  letterSpacing: number
   columns: number
   files: FileList
   useFileName: boolean
@@ -136,17 +137,31 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
           <Label htmlFor="use-file-name">Use file name?</Label>
           </div>
         </div>
-        <div className='flex flex-col gap-2'>
-          <Label htmlFor="fontSize">Font size</Label>
-          <InputGroup>
-            <InputGroupInput id='fontSize' placeholder="0" {...register('fontSize', {
-                valueAsNumber: true
-              })}
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupText>px</InputGroupText>
-            </InputGroupAddon>
-          </InputGroup>
+        <div className='flex gap-2 w-full'>
+          <div className='flex flex-col gap-2 flex-1'>
+            <Label htmlFor="fontSize">Font size</Label>
+            <InputGroup>
+              <InputGroupInput id='fontSize' placeholder="0.0" {...register('fontSize', {
+                  valueAsNumber: true
+                })}
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText>pt</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
+          </div>
+          <div className='flex flex-col gap-2 flex-1'>
+            <Label htmlFor="letterSpacing">Letter spacing</Label>
+            <InputGroup>
+              <InputGroupInput id='letterSpacing' placeholder="0.0" {...register('letterSpacing', {
+                  valueAsNumber: true
+                })}
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText>pt</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
+          </div>
         </div>
         <div className='flex flex-col gap-2'>
           <Label htmlFor="columns">Columns</Label>
@@ -171,6 +186,7 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
             <Button
               variant='outline'
               aria-label="Plus"
+              type='button'
               onClick={() => {
                 appendTags({
                   value: tag
@@ -188,6 +204,7 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
                   <Button
                     size='xs'
                     className='p-0 cursor-pointer'
+                    type='button'
                     onClick={
                       () => removeTags(idx)
                     }
@@ -207,6 +224,7 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
             <Button
               variant='outline'
               aria-label="Plus"
+              type='button'
               onClick={() => {
                 appendIgnored({
                   value: section
@@ -223,6 +241,7 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
                 <Badge variant='default'>
                   <Button
                     size='xs'
+                    type='button'
                     className='p-0 cursor-pointer'
                     onClick={
                       () => removeIgnored(idx)
@@ -237,7 +256,7 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
           </ul>
         </div>
         <div className='flex flex-col gap-2'>
-          <Label htmlFor="columns">Paper Type</Label>
+          <Label htmlFor="paperSize">Paper Type</Label>
           <Controller
             name="paperSize"
             control={control}

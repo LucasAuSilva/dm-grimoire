@@ -45,7 +45,7 @@ export function EmptyPreview({ formRefs: { fileInputRef, formRef: formRef } }: E
       <EmptyMedia variant="icon">
         <IconFileTypePdf />
       </EmptyMedia>
-      {isLoading ? (
+      {!isLoading ? (
         <EmptyHeader>
           <EmptyTitle>No Previews Yet</EmptyTitle>
           <EmptyDescription>

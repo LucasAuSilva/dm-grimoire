@@ -10,7 +10,7 @@ from html_generator import (
 def preview_html(md_files, config):
     title = config.get("title", "Preview")
     columns = int(config.get("columns", 1))
-    font_size = int(config.get("font_size", 10))
+    font_size = float(config.get("font_size", 10))
     ignored = config.get("ignored", [])
     tags = config.get("tags", [])
     paper_size = config.get("paper_size", "BINDER")

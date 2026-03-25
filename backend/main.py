@@ -70,4 +70,3 @@ async def preview(
         content=pdf_bytes,
         media_type="application/pdf"
     )
-

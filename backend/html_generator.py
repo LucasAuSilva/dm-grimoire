@@ -21,31 +21,31 @@ def fits_in_pages(html, page_numbers):
 PAPER_SIZES = {
     "A4": {
         "size": "210mm 297mm",
-        "margin-top": "6mm",
-        "margin-bottom": "6mm",
-        "margin-left": "6mm",
-        "margin-right": "6mm"
+        "margin-top": "8mm",
+        "margin-bottom": "8mm",
+        "margin-left": "8mm",
+        "margin-right": "8mm"
     },
     "A5": {
         "size": "148mm 210mm",
+        "margin-top": "3mm",
+        "margin-bottom": "8mm",
+        "margin-left": "6mm",
+        "margin-right": "6mm"
+    },
+    "A6": {
+        "size": "105mm 148mm",
         "margin-top": "4mm",
         "margin-bottom": "4mm",
         "margin-left": "4mm",
         "margin-right": "4mm"
     },
-    "A6": {
-        "size": "105mm 148mm",
-        "margin-top": "2mm",
-        "margin-bottom": "2mm",
-        "margin-left": "2mm",
-        "margin-right": "2mm"
-    },
     "BINDER": {
         "size": "200mm 275mm",
-        "margin-top": "6mm",
-        "margin-bottom": "6mm",
-        "margin-left": "22mm",
-        "margin-right": "6mm"
+        "margin-top": "8mm",
+        "margin-bottom": "8mm",
+        "margin-left": "12mm",
+        "margin-right": "8mm"
     }
 }
 
@@ -68,6 +68,8 @@ def build_html(title, body, font_size, columns, paper_size, margin_left):
         }}
         """
 
+    print("font_size: ", font_size)
+
     css = f"""
     @page {{
         size: {PAPER_SIZES[paper_size]["size"]};
@@ -81,31 +83,33 @@ def build_html(title, body, font_size, columns, paper_size, margin_left):
         font-family: Georgia, serif;
         font-size: {font_size}pt;
         line-height: 1.15;
+        font-stretch: condensed;
+        letter-spacing: -0.4pt;
     }}
 
     h1 {{
-        font-size: {font_size + 4}pt;
+        font-size: {font_size + 2}pt;
         text-align: center;
         border-bottom: 2px solid black;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
     }}
 
     h2 {{
         font-size: {font_size + 0.6}pt;
         font-variant: small-caps;
         border-bottom: 1px solid #444;
-        margin-top: 6px;
+        margin-top: 3px;
     }}
 
     h3 {{
         font-size: {font_size + 0.3}pt;
         font-variant: small-caps;
-        margin-top: 6px;
+        margin-top: 3px;
     }}
 
     p {{
-        margin-top: 2px;
-        margin-bottom: 4px;
+        margin-top: 1px;
+        margin-bottom: 1px;
     }}
 
     ul {{
