@@ -120,6 +120,11 @@ def build_html(title, body, font_size, columns, paper_size, margin_left):
     li {{
         margin-bottom: 1px;
     }}
+
+    li.checkbox {{
+        list-style: none;
+        margin-left: -8px;
+    }}
     """
 
     return f"""

@@ -41,6 +41,10 @@ def preview_html(md_files, config):
     )
 
     html_body = remove_empty_html_lists(html_body)
+
+    html_body = html_body.replace("<li>☐", '<li class="checkbox">☐')
+    html_body = html_body.replace("<li>☑", '<li class="checkbox">☑')
+
     html = build_html(
         title,
         html_body,

@@ -61,8 +61,8 @@ def fix_obsidian_links(md):
 
 
 def fix_checkboxes(md):
-    md = md.replace("- [ ]", "- ☐")
     md = md.replace("- [x]", "- ☑")
+    md = md.replace("- [ ]", "- ☐")
     return md
 
 
