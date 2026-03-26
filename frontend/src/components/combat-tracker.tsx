@@ -2,7 +2,7 @@ import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { Separator } from "./ui/separator"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 
 import { IconPlayerSkipBack, IconPlayerSkipForward } from "@tabler/icons-react"
 import type { Combatant } from "@/utils/types"
@@ -64,6 +64,22 @@ export function CombatTracker() {
     if (activeIndex === 0 && round > 1) setRound(r => r - 1)
     setActiveIndex(prevIdx)
   }, [order, activeIndex, round])
+
+  // inside CombatTracker, after your next/prev definitions:
+  useEffect(() => {
+    if (!started) return
+
+    const handleKey = (e: KeyboardEvent) => {
+      // ignore if user is typing in an input/textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      if (e.key === 'ArrowRight') next()
+      if (e.key === 'ArrowLeft') prev()
+    }
+
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [started, next, prev])
 
   const reset = () => {
     setActiveIndex(0)
