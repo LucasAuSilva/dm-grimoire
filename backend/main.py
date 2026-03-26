@@ -9,6 +9,7 @@ from engine import preview_html
 app = FastAPI()
 
 origins = [
+    "https://dm-grimoire.lucassilvadev.com",
     "http://localhost:5173",  # Vite dev server
     "http://localhost:3000",  # Vite Docker
 ]

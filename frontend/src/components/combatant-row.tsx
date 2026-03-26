@@ -1,5 +1,4 @@
-import type { Combatant, Condition } from "@/utils/types"
-import type { LogEvent } from "@/hooks/combat-log"
+import type { Combatant, Condition, LogEvent } from "@/utils/types"
 
 import { useState } from "react"
 import { Badge } from "./ui/badge"

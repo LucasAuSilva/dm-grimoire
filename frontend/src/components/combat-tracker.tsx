@@ -5,13 +5,12 @@ import { Separator } from "./ui/separator"
 import { useState, useCallback, useEffect } from "react"
 
 import { IconDownload, IconPlayerSkipBack, IconPlayerSkipForward } from "@tabler/icons-react"
-import type { Combatant } from "@/utils/types"
+import type { Combatant, CombatLog } from "@/utils/types"
 import { CombatantForm } from "./combatant-form"
 import { CombatantRow } from "./combatant-row"
 import { ImportCharactersDialog } from "./import-characters-dialog"
 import { useCombatLog } from "@/hooks/combat-log"
 import { downloadLog } from "@/utils/combat-utils"
-import type { CombatLog } from "@/hooks/combat-log"
 
 const sorted = (list: Combatant[]) =>
   [...list].sort((a, b) => b.initiative - a.initiative)
