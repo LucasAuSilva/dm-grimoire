@@ -6,7 +6,6 @@ import { Label } from './ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Button } from './ui/button'
 
-import axios from 'axios'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { ButtonGroup } from './ui/button-group'
 import { IconPlus, IconX } from '@tabler/icons-react'
@@ -15,6 +14,7 @@ import { Badge } from './ui/badge'
 import { Checkbox } from './ui/checkbox'
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from './ui/input-group'
 import { useLoadingContext } from '@/context/loading-context'
+import api from '@/lib/api'
 
 
 interface PropertiesSideBarProps {
@@ -100,8 +100,8 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
     updateLoading(true)
 
     try {
-      const res = await axios.post(
-        "http://localhost:8000/preview",
+      const res = await api.post(
+        "/preview",
         formData,
         {
           headers: {
