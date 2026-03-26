@@ -1,4 +1,5 @@
-import type { Combatant } from "@/utils/types"
+import type { Combatant, Condition } from "@/utils/types"
+import type { LogEvent } from "@/hooks/combat-log"
 
 import { useState } from "react"
 import { Badge } from "./ui/badge"
@@ -7,7 +8,6 @@ import { Button } from "./ui/button"
 import { ConditionBadge } from "./condition-badge"
 import { EditableField } from "./editable-field"
 import { AddConditionDialog } from "./add-condition-dialog"
-import type { Condition } from "@/utils/types"
 
 interface CombatantRowProps {
   combatant: Combatant
@@ -15,16 +15,54 @@ interface CombatantRowProps {
   currentRound: number
   onChange: (updated: Combatant) => void
   onRemove: () => void
+  onLog: (event: Omit<LogEvent, 'timestamp'>) => void
 }
 
-export function CombatantRow({ combatant: c, isActive, currentRound, onChange, onRemove }: CombatantRowProps) {
+export function CombatantRow({ combatant: c, isActive, currentRound, onChange, onRemove, onLog }: CombatantRowProps) {
   const [conditionOpen, setConditionOpen] = useState(false)
 
-  const addCondition = (condition: Condition) =>
+  const addCondition = (condition: Condition) => {
     onChange({ ...c, conditions: [...c.conditions, condition] })
+    onLog({
+      type: 'condition_added',
+      targetName: c.name,
+      conditionName: condition.name,
+      round: currentRound,
+    })
+  }
 
-  const removeCondition = (id: string) =>
-    onChange({ ...c, conditions: c.conditions.filter(cond => cond.id !== id) })
+  const removeCondition = (id: string) => {
+    const cond = c.conditions.find(x => x.id === id)
+    onChange({ ...c, conditions: c.conditions.filter(x => x.id !== id) })
+    if (cond) {
+      onLog({
+        type: 'condition_expired',
+        targetName: c.name,
+        conditionName: cond.name,
+        round: currentRound,
+      })
+    }
+  }
+
+  const handleHpCommit = (next: number) => {
+    const delta = next - c.currentHp
+    if (delta === 0) return
+    onChange({ ...c, currentHp: next })
+    onLog({
+      type: 'hp_change',
+      targetName: c.name,
+      delta,
+      previousHp: c.currentHp,
+      newHp: next,
+      maxHp: c.maxHp,
+      round: currentRound,
+    })
+  }
+
+  const handleMaxHpCommit = (next: number) => {
+    const newCurrentHp = Math.min(c.currentHp, next)
+    onChange({ ...c, maxHp: next, currentHp: newCurrentHp })
+  }
 
   const hpPercent = c.maxHp > 0 ? (c.currentHp / c.maxHp) * 100 : 100
   const hpColor = hpPercent > 50 ? 'bg-green-500' : hpPercent > 25 ? 'bg-yellow-500' : 'bg-red-500'
@@ -34,8 +72,8 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
       <div className={`rounded-lg border transition-all ${
         c.currentHp === 0
           ? c.isPlayer
-            ? 'border-gray-500/40 bg-gray-500/10 opacity-60'       // unconscious player
-            : 'border-red-900/40 bg-red-950/20 opacity-50'         // dead monster
+            ? 'border-gray-500/40 bg-gray-500/10 opacity-60'
+            : 'border-red-900/40 bg-red-950/20 opacity-50'
           : isActive
             ? 'border-primary bg-primary/5 shadow-md'
             : 'border-border bg-background'
@@ -57,7 +95,9 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
           {/* Name + conditions */}
           <div className="flex flex-col gap-1 flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className={`font-semibold truncate ${isActive ? 'text-primary' : ''} ${c.currentHp === 0 ? 'line-through opacity-60' : ''}`}>{c.name}</span>
+              <span className={`font-semibold truncate ${isActive ? 'text-primary' : ''} ${c.currentHp === 0 ? 'line-through opacity-60' : ''}`}>
+                {c.name}
+              </span>
               {c.isPlayer && <Badge variant="secondary" className="text-xs py-0">PC</Badge>}
               {c.currentHp === 0 && (
                 <Badge variant="outline" className={`text-xs py-0 ${c.isPlayer ? 'border-gray-400 text-gray-400' : 'border-red-700 text-red-600'}`}>
@@ -100,7 +140,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
                 min={0}
                 max={c.maxHp}
                 className={hpPercent <= 25 ? 'text-red-400' : hpPercent <= 50 ? 'text-yellow-400' : 'text-green-400'}
-                onCommit={next => onChange({ ...c, currentHp: next })}
+                onCommit={handleHpCommit}
               />
               <span className="text-muted-foreground">/</span>
               <EditableField
@@ -109,7 +149,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
                 min={0}
                 max={9999}
                 className="text-muted-foreground"
-                onCommit={next => onChange({ ...c, maxHp: next, currentHp: Math.min(c.currentHp, next) })}
+                onCommit={handleMaxHpCommit}
               />
             </div>
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -119,23 +159,10 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
 
           {/* Add condition + remove */}
           <div className="flex gap-1 shrink-0">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              title="Add condition"
-              onClick={() => setConditionOpen(true)}
-            >
+            <Button type="button" variant="ghost" size="icon" className="h-7 w-7" title="Add condition" onClick={() => setConditionOpen(true)}>
               <IconPlus size={14} />
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              onClick={onRemove}
-            >
+            <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={onRemove}>
               <IconTrash size={14} />
             </Button>
           </div>
