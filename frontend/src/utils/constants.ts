@@ -1,3 +1,8 @@
+export const COMMON_CONDITIONS = [
+  'Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened',
+  'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified',
+  'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious'
+]
 
 export type PaperSizes = "A4" | "A5" | "A6" | "BINDER"
 

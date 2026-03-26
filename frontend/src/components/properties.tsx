@@ -56,7 +56,8 @@ export function PropertiesSideBar({ setPreview, formRefs: { fileInputRef, formRe
       columns: 2,
       fontSize: 10,
       letterSpacing: 0,
-      paperSize: 'A4'
+      paperSize: 'A4',
+      fontFamily: 'EB Garamond'
     }
   })
 
