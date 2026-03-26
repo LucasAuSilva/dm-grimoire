@@ -61,8 +61,8 @@ export function EditableField({ value, base, min, max, className = '', onCommit 
   return (
     <span
       className={`font-mono font-semibold cursor-pointer select-none hover:underline hover:underline-offset-2 ${className}`}
-      onDoubleClick={open}
-      title="Double-click to edit (+10, -5, or absolute value)"
+      onClick={open}
+      title="Click to edit (+10, -5, or absolute value)"
     >
       {value}
     </span>

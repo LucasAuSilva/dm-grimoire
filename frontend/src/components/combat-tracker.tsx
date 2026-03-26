@@ -8,6 +8,7 @@ import { IconPlayerSkipBack, IconPlayerSkipForward } from "@tabler/icons-react"
 import type { Combatant } from "@/utils/types"
 import { CombatantForm } from "./combatant-form"
 import { CombatantRow } from "./combatant-row"
+import { ImportCharactersDialog } from "./import-characters-dialog"
 
 const sorted = (list: Combatant[]) =>
   [...list].sort((a, b) => b.initiative - a.initiative)
@@ -78,16 +79,9 @@ export function CombatTracker() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold">Combat Tracker</h2>
-          {started && (
-            <div className="flex items-center gap-3 text-sm">
-              <Badge variant="outline" className="text-base font-mono px-3 py-1">
-                Round {round}
-              </Badge>
-              {order[activeIndex] && (
-                <span className="text-muted-foreground">
-                  → <span className="text-foreground font-medium">{order[activeIndex].name}</span>
-                </span>
-              )}
+          {!started && (
+            <div className="flex justify-end">
+              <ImportCharactersDialog onImport={addMultipleCombatants} />
             </div>
           )}
         </div>
@@ -117,8 +111,20 @@ export function CombatTracker() {
 
       <Separator />
 
-      {/* Add form — always visible so DM can add combatants mid-combat too */}
+      {/* Import + Add form */}
       <CombatantForm onAdd={addCombatant} onAddMultiple={addMultipleCombatants} />
+      {started && (
+        <div className="flex items-center gap-3 text-sm">
+          <Badge variant="outline" className="text-base font-mono px-3 py-1">
+            Round {round}
+          </Badge>
+          {order[activeIndex] && (
+            <span className="text-muted-foreground">
+              → <span className="text-foreground font-medium">{order[activeIndex].name}</span>
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Combatant list */}
       {order.length === 0 ? (

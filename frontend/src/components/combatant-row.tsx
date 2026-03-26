@@ -84,7 +84,13 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
         {/* AC */}
         <div className="flex items-center gap-1 text-sm text-muted-foreground shrink-0">
           <IconShield size={14} />
-          <span>{c.ac}</span>
+          <EditableField
+            value={c.ac}
+            base={c.ac}
+            min={10}
+            max={100}
+            onCommit={next => onChange({ ...c, ac: next })}
+          />
         </div>
 
         {/* HP section */}
