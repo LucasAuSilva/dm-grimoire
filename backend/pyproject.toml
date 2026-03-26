@@ -8,5 +8,6 @@ dependencies = [
     "fastapi[standard]>=0.135.1",
     "markdown>=3.10.2",
     "pypdf>=6.7.5",
+    "slowapi>=0.1.9",
     "weasyprint>=68.1",
 ]
