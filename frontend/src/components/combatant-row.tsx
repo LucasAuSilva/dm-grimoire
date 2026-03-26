@@ -31,7 +31,15 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
 
   return (
     <>
-      <div className={`rounded-lg border transition-all ${isActive ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-background'}`}>
+      <div className={`rounded-lg border transition-all ${
+        c.currentHp === 0
+          ? c.isPlayer
+            ? 'border-gray-500/40 bg-gray-500/10 opacity-60'       // unconscious player
+            : 'border-red-900/40 bg-red-950/20 opacity-50'         // dead monster
+          : isActive
+            ? 'border-primary bg-primary/5 shadow-md'
+            : 'border-border bg-background'
+      }`}>
         <div className="flex items-center gap-3 p-3">
 
           {/* Initiative bubble */}
@@ -49,8 +57,13 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
           {/* Name + conditions */}
           <div className="flex flex-col gap-1 flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className={`font-semibold truncate ${isActive ? 'text-primary' : ''}`}>{c.name}</span>
+              <span className={`font-semibold truncate ${isActive ? 'text-primary' : ''} ${c.currentHp === 0 ? 'line-through opacity-60' : ''}`}>{c.name}</span>
               {c.isPlayer && <Badge variant="secondary" className="text-xs py-0">PC</Badge>}
+              {c.currentHp === 0 && (
+                <Badge variant="outline" className={`text-xs py-0 ${c.isPlayer ? 'border-gray-400 text-gray-400' : 'border-red-700 text-red-600'}`}>
+                  {c.isPlayer ? 'Unconscious' : 'Dead'}
+                </Badge>
+              )}
             </div>
             {c.conditions.length > 0 && (
               <div className="flex flex-wrap gap-1">
