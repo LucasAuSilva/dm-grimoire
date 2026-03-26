@@ -72,6 +72,12 @@ export function CombatTracker() {
     setCombatants([])
   }
 
+  const closeCombat = () => {
+    setActiveIndex(0)
+    setRound(1)
+    setStarted(false)
+  }
+
   return (
     <div className="flex flex-col gap-4 max-w-3xl mx-auto">
 
@@ -104,6 +110,11 @@ export function CombatTracker() {
           {combatants.length > 0 && (
             <Button type="button" size="sm" variant="destructive" onClick={reset}>
               Reset
+            </Button>
+          )}
+          {started && (
+            <Button type="button" size="sm" variant="destructive" onClick={closeCombat}>
+              Close combat
             </Button>
           )}
         </div>
