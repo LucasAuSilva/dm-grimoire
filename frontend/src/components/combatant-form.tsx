@@ -8,6 +8,7 @@ import { Button } from "./ui/button"
 import { IconPlus, IconUsers } from "@tabler/icons-react"
 import { uid } from "@/utils/helpers"
 import { MultipleAddDialog } from "./multiple-add-dialog"
+import { SearchMonsterDialog } from "./search-monster-dialog"
 
 interface AddFormProps {
   onAdd: (c: Combatant) => void
@@ -129,15 +130,24 @@ export function CombatantForm({ onAdd, onAddMultiple }: AddFormProps) {
               <IconPlus size={14} /> Add
             </Button>
             {!isPlayer && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-1"
-                onClick={() => setMultipleOpen(true)}
-              >
-                <IconUsers size={14} /> Add Multiple
-              </Button>
+              <>
+                <SearchMonsterDialog
+                  onSelect={(monster) => {
+                    setValue('name', monster.name)
+                    setValue('ac', monster.armor_class)
+                    setValue('maxHp', monster.hit_points)
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                  onClick={() => setMultipleOpen(true)}
+                >
+                  <IconUsers size={14} /> Add Multiple
+                </Button>
+              </>
             )}
           </div>
         </form>

@@ -1,4 +1,21 @@
 
+export interface RequestOpen5e<T> {
+  count: number
+  next: any
+  previous: any
+  results: T[]
+}
+
+export interface Monster {
+  slug: string
+  name: string
+  armor_class: number
+  armor_desc: any
+  hit_points: number
+  document__title: string
+}
+
+
 export interface Condition {
   id: string
   name: string
