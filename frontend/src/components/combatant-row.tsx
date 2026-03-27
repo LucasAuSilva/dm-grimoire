@@ -69,7 +69,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
   return (
     <>
       <div className={`rounded-lg border transition-all ${
-        c.currentHp === 0
+        c.currentHp === 0 && c.maxHp !== 0
           ? c.isPlayer
             ? 'border-gray-500/40 bg-gray-500/10 opacity-60'
             : 'border-red-900/40 bg-red-950/20 opacity-50'
