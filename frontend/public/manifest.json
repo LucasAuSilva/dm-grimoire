@@ -1,0 +1,12 @@
+{
+  "name": "Combat Tracker",
+  "version": "1.0.0",
+  "manifest_version": 1,
+  "action": {
+    "title": "Combat Tracker",
+    "icon": "/dm_grimoire_icon.svg",
+    "popover": "/combat-tracker",
+    "height": 600,
+    "width": 400
+  }
+}
