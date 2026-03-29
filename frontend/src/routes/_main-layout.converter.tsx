@@ -4,7 +4,7 @@ import PreviewPage from '@/components/preview-page'
 import { PropertiesSideBar } from '@/components/properties'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/converter')({
+export const Route = createFileRoute('/_main-layout/converter')({
   component: RouteComponent,
 })
 

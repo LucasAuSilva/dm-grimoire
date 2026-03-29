@@ -14,7 +14,7 @@ import { downloadLog } from "@/utils/combat-utils"
 
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/combat-tracker')({
+export const Route = createFileRoute('/_main-layout/tracker')({
   component: RouteComponent,
 })
 

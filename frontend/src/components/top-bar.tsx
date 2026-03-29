@@ -25,7 +25,7 @@ export function TopBar() {
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
             <Button asChild variant='ghost' className="cursor-pointer">
-              <Link to="/combat-tracker">
+              <Link to="/tracker">
                 Combat Tracker
               </Link>
             </Button>

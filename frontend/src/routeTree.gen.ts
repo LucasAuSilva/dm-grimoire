@@ -9,86 +9,161 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ConverterRouteImport } from './routes/converter'
-import { Route as CombatTrackerRouteImport } from './routes/combat-tracker'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as MainLayoutRouteImport } from './routes/_main-layout'
+import { Route as MainLayoutIndexRouteImport } from './routes/_main-layout.index'
+import { Route as MainLayoutTrackerRouteImport } from './routes/_main-layout.tracker'
+import { Route as MainLayoutConverterRouteImport } from './routes/_main-layout.converter'
+import { Route as extensionsLayoutRouteImport } from './routes/(extensions)/_layout'
+import { Route as extensionsLayoutCombatTrackerRouteImport } from './routes/(extensions)/_layout.combat-tracker'
 
-const ConverterRoute = ConverterRouteImport.update({
-  id: '/converter',
-  path: '/converter',
+const MainLayoutRoute = MainLayoutRouteImport.update({
+  id: '/_main-layout',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CombatTrackerRoute = CombatTrackerRouteImport.update({
-  id: '/combat-tracker',
-  path: '/combat-tracker',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const MainLayoutIndexRoute = MainLayoutIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutTrackerRoute = MainLayoutTrackerRouteImport.update({
+  id: '/tracker',
+  path: '/tracker',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const MainLayoutConverterRoute = MainLayoutConverterRouteImport.update({
+  id: '/converter',
+  path: '/converter',
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+const extensionsLayoutRoute = extensionsLayoutRouteImport.update({
+  id: '/(extensions)/_layout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const extensionsLayoutCombatTrackerRoute =
+  extensionsLayoutCombatTrackerRouteImport.update({
+    id: '/combat-tracker',
+    path: '/combat-tracker',
+    getParentRoute: () => extensionsLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/combat-tracker': typeof CombatTrackerRoute
-  '/converter': typeof ConverterRoute
+  '/': typeof MainLayoutIndexRoute
+  '/converter': typeof MainLayoutConverterRoute
+  '/tracker': typeof MainLayoutTrackerRoute
+  '/combat-tracker': typeof extensionsLayoutCombatTrackerRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/combat-tracker': typeof CombatTrackerRoute
-  '/converter': typeof ConverterRoute
+  '/converter': typeof MainLayoutConverterRoute
+  '/tracker': typeof MainLayoutTrackerRoute
+  '/': typeof MainLayoutIndexRoute
+  '/combat-tracker': typeof extensionsLayoutCombatTrackerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/combat-tracker': typeof CombatTrackerRoute
-  '/converter': typeof ConverterRoute
+  '/_main-layout': typeof MainLayoutRouteWithChildren
+  '/(extensions)/_layout': typeof extensionsLayoutRouteWithChildren
+  '/_main-layout/converter': typeof MainLayoutConverterRoute
+  '/_main-layout/tracker': typeof MainLayoutTrackerRoute
+  '/_main-layout/': typeof MainLayoutIndexRoute
+  '/(extensions)/_layout/combat-tracker': typeof extensionsLayoutCombatTrackerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/combat-tracker' | '/converter'
+  fullPaths: '/' | '/converter' | '/tracker' | '/combat-tracker'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/combat-tracker' | '/converter'
-  id: '__root__' | '/' | '/combat-tracker' | '/converter'
+  to: '/converter' | '/tracker' | '/' | '/combat-tracker'
+  id:
+    | '__root__'
+    | '/_main-layout'
+    | '/(extensions)/_layout'
+    | '/_main-layout/converter'
+    | '/_main-layout/tracker'
+    | '/_main-layout/'
+    | '/(extensions)/_layout/combat-tracker'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  CombatTrackerRoute: typeof CombatTrackerRoute
-  ConverterRoute: typeof ConverterRoute
+  MainLayoutRoute: typeof MainLayoutRouteWithChildren
+  extensionsLayoutRoute: typeof extensionsLayoutRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/converter': {
-      id: '/converter'
-      path: '/converter'
-      fullPath: '/converter'
-      preLoaderRoute: typeof ConverterRouteImport
+    '/_main-layout': {
+      id: '/_main-layout'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof MainLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/combat-tracker': {
-      id: '/combat-tracker'
-      path: '/combat-tracker'
-      fullPath: '/combat-tracker'
-      preLoaderRoute: typeof CombatTrackerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_main-layout/': {
+      id: '/_main-layout/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof MainLayoutIndexRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_main-layout/tracker': {
+      id: '/_main-layout/tracker'
+      path: '/tracker'
+      fullPath: '/tracker'
+      preLoaderRoute: typeof MainLayoutTrackerRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/_main-layout/converter': {
+      id: '/_main-layout/converter'
+      path: '/converter'
+      fullPath: '/converter'
+      preLoaderRoute: typeof MainLayoutConverterRouteImport
+      parentRoute: typeof MainLayoutRoute
+    }
+    '/(extensions)/_layout': {
+      id: '/(extensions)/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof extensionsLayoutRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/(extensions)/_layout/combat-tracker': {
+      id: '/(extensions)/_layout/combat-tracker'
+      path: '/combat-tracker'
+      fullPath: '/combat-tracker'
+      preLoaderRoute: typeof extensionsLayoutCombatTrackerRouteImport
+      parentRoute: typeof extensionsLayoutRoute
     }
   }
 }
 
+interface MainLayoutRouteChildren {
+  MainLayoutConverterRoute: typeof MainLayoutConverterRoute
+  MainLayoutTrackerRoute: typeof MainLayoutTrackerRoute
+  MainLayoutIndexRoute: typeof MainLayoutIndexRoute
+}
+
+const MainLayoutRouteChildren: MainLayoutRouteChildren = {
+  MainLayoutConverterRoute: MainLayoutConverterRoute,
+  MainLayoutTrackerRoute: MainLayoutTrackerRoute,
+  MainLayoutIndexRoute: MainLayoutIndexRoute,
+}
+
+const MainLayoutRouteWithChildren = MainLayoutRoute._addFileChildren(
+  MainLayoutRouteChildren,
+)
+
+interface extensionsLayoutRouteChildren {
+  extensionsLayoutCombatTrackerRoute: typeof extensionsLayoutCombatTrackerRoute
+}
+
+const extensionsLayoutRouteChildren: extensionsLayoutRouteChildren = {
+  extensionsLayoutCombatTrackerRoute: extensionsLayoutCombatTrackerRoute,
+}
+
+const extensionsLayoutRouteWithChildren =
+  extensionsLayoutRoute._addFileChildren(extensionsLayoutRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CombatTrackerRoute: CombatTrackerRoute,
-  ConverterRoute: ConverterRoute,
+  MainLayoutRoute: MainLayoutRouteWithChildren,
+  extensionsLayoutRoute: extensionsLayoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
