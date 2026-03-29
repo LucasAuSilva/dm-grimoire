@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ConverterRouteImport } from './routes/converter'
 import { Route as CombatTrackerRouteImport } from './routes/combat-tracker'
+import { Route as IndexRouteImport } from './routes/index'
 
 const ConverterRoute = ConverterRouteImport.update({
   id: '/converter',
@@ -22,29 +23,38 @@ const CombatTrackerRoute = CombatTrackerRouteImport.update({
   path: '/combat-tracker',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/combat-tracker': typeof CombatTrackerRoute
   '/converter': typeof ConverterRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/combat-tracker': typeof CombatTrackerRoute
   '/converter': typeof ConverterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/combat-tracker': typeof CombatTrackerRoute
   '/converter': typeof ConverterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/combat-tracker' | '/converter'
+  fullPaths: '/' | '/combat-tracker' | '/converter'
   fileRoutesByTo: FileRoutesByTo
-  to: '/combat-tracker' | '/converter'
-  id: '__root__' | '/combat-tracker' | '/converter'
+  to: '/' | '/combat-tracker' | '/converter'
+  id: '__root__' | '/' | '/combat-tracker' | '/converter'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   CombatTrackerRoute: typeof CombatTrackerRoute
   ConverterRoute: typeof ConverterRoute
 }
@@ -65,10 +75,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CombatTrackerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   CombatTrackerRoute: CombatTrackerRoute,
   ConverterRoute: ConverterRoute,
 }
