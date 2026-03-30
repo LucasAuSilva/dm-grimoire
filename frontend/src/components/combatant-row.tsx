@@ -106,7 +106,7 @@ export function CombatantRow({
               max={99}
               className="text-sm"
               onCommit={next => onChange({ ...c, initiative: next })}
-              readonly={readonly}
+              readOnly={readonly}
             />
           </div>
 

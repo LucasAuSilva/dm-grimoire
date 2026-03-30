@@ -86,6 +86,7 @@ export function ImportCharactersDialog({ onImport, compact = false }: ImportChar
       currentHp: current.maxHp,
       conditions: [],
       isPlayer: true,
+      isHidden: false,
     })
 
     if (isLast) {

@@ -22,10 +22,9 @@ import { IconChevronDown } from "@tabler/icons-react"
 
 interface SelectLogComboboxProps {
   onSelectChange: (log: CombatLog) => void
-  compact?: boolean
 }
 
-export function SelectLogCombobox({ onSelectChange, compact = false }: SelectLogComboboxProps) {
+export function SelectLogCombobox({ onSelectChange }: SelectLogComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [data, setData] = React.useState<CombatLog[]>()
   const [selected, setSelected] = React.useState<CombatLog>()
