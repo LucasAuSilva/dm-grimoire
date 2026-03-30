@@ -16,7 +16,6 @@ import type { Combatant, CombatLog } from '@/utils/types'
 import { IconChevronsDown, IconPlayerSkipBack, IconPlayerSkipForward } from '@tabler/icons-react'
 
 import { createFileRoute } from '@tanstack/react-router'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import OBR from '@owlbear-rodeo/sdk'
 import { COMBAT_STATE_KEY, PLUGIN_ID } from '@/utils/constants'
@@ -40,7 +39,8 @@ function RouteComponent() {
   const [round, setRound] = usePersistedState<number>('combat-tracker:round', 1)
   const [started, setStarted] = usePersistedState<boolean>('combat-tracker:started', false)
 
-  const { isGM } = useObrRole()
+  // role is null while OBR is initializing — wait for it to resolve
+  const { role, isGM } = useObrRole()
 
   const { startLog, addEvent, endLog } = useCombatLog()
 
@@ -70,23 +70,16 @@ function RouteComponent() {
 
   const next = useCallback(() => {
     if (order.length === 0) return
-
     const nextIdx = (activeIndex + 1) % order.length
     const nextRound = nextIdx === 0 ? round + 1 : round
-
     if (nextIdx === 0) {
       setRound(r => r + 1)
       addEvent({ type: 'round_start', round: nextRound })
     }
-
     setActiveIndex(nextIdx)
-
-    // Log next turn
     if (order[nextIdx]) {
       addEvent({ type: 'turn_start', combatantName: order[nextIdx].name, round: nextRound })
     }
-
-    // Auto-remove expired conditions and log them
     const active = order[activeIndex]
     if (active) {
       const expired = active.conditions.filter(
@@ -132,47 +125,60 @@ function RouteComponent() {
     if (clearCombatants) setCombatants([])
   }
 
+  // Listen for tokens added via context menu
   useEffect(() => {
-    OBR.onReady(() => {
-      OBR.room.onMetadataChange((metadata) => {
-        const pending = metadata[`${PLUGIN_ID}/pending-initiative`] as { id: string, name: string }[] | undefined
-        if (pending && pending.length > 0) {
-          setPendingTokens(pending)
-          OBR.room.setMetadata({ [`${PLUGIN_ID}/pending-initiative`]: [] })
-        }
-      })
+    const unsubscribe = OBR.room.onMetadataChange((metadata) => {
+      const pending = metadata[`${PLUGIN_ID}/pending-initiative`] as { id: string, name: string }[] | undefined
+      if (pending && pending.length > 0) {
+        setPendingTokens(pending)
+        OBR.room.setMetadata({ [`${PLUGIN_ID}/pending-initiative`]: [] })
+      }
     })
+    return () => unsubscribe()
   }, [])
 
-  // sync TO room metadata whenever state changes (GM only)
+  // GM Update Metadata
   useEffect(() => {
-    if (!isGM) return
-    OBR.onReady(() => {
-      OBR.room.setMetadata({
-        [COMBAT_STATE_KEY]: {
-          combatants,
-          activeIndex,
-          round,
-          started,
-        }
-      })
-    })
-  }, [combatants, activeIndex, round, started, isGM])
+    if (role === null || !isGM) return
 
-  // sync FROM room metadata (players)
-  useEffect(() => {
-    if (isGM) return
-    OBR.onReady(() => {
-      return OBR.room.onMetadataChange(metadata => {
-        const state = metadata[COMBAT_STATE_KEY] as any
-        if (!state) return
-        setCombatants(state.combatants ?? [])
-        setActiveIndex(state.activeIndex ?? 0)
-        setRound(state.round ?? 1)
-        setStarted(state.started ?? false)
-      })
+    OBR.room.setMetadata({
+      [COMBAT_STATE_KEY]: { combatants, activeIndex, round, started },
     })
-  }, [isGM])
+  }, [role, isGM, combatants, activeIndex, round, started])
+
+  // Player Receives Metadata
+  useEffect(() => {
+    if (role === null || isGM) return
+
+    let cancelled = false
+
+    const applyState = (state: any) => {
+      if (!state || cancelled) return
+      setCombatants(state.combatants ?? [])
+      setActiveIndex(state.activeIndex ?? 0)
+      setRound(state.round ?? 1)
+      setStarted(state.started ?? false)
+    }
+
+    let unsubscribe: (() => void) | undefined
+
+    ;(async () => {
+      const metadata = await OBR.room.getMetadata()
+      applyState(metadata[COMBAT_STATE_KEY])
+
+      unsubscribe = OBR.room.onMetadataChange((metadata) => {
+        applyState(metadata[COMBAT_STATE_KEY])
+      })
+    })()
+
+    return () => {
+      cancelled = true
+      unsubscribe?.()
+    }
+  }, [role, isGM])
+
+  // If role not resolved yet, show nothing
+  if (role === null) return null
 
   return (
     <Collapsible
@@ -180,7 +186,6 @@ function RouteComponent() {
       onOpenChange={setIsCollapsibleOpen}
       className="flex flex-col gap-4 max-w-3xl mx-auto"
     >
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -200,12 +205,9 @@ function RouteComponent() {
           )}
         </div>
         <div className="flex gap-2 items-center">
-
-          {/* Download last log */}
           {lastLog && !started && (
             <DownloadLogDialog compact />
           )}
-
           {isGM && combatants.length > 0 && !started && (
             <Button type="button" size="sm" onClick={startCombat}>
               Start Combat
@@ -240,9 +242,10 @@ function RouteComponent() {
       </div>
 
       <Separator />
+
       {isGM && (
         <CollapsibleContent>
-          <CombatantForm onAdd={addCombatant} onAddMultiple={addMultipleCombatants} compact/>
+          <CombatantForm onAdd={addCombatant} onAddMultiple={addMultipleCombatants} compact />
         </CollapsibleContent>
       )}
 
@@ -261,7 +264,7 @@ function RouteComponent() {
 
       {order.length === 0 ? (
         <div className="text-center text-muted-foreground py-16 text-sm">
-          No combatants yet — add some above to get started.
+          {isGM ? 'No combatants yet — add some above to get started.' : 'Waiting for the GM to start combat...'}
         </div>
       ) : (
         <div className="flex flex-col gap-2">

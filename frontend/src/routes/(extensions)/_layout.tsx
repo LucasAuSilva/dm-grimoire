@@ -1,9 +1,8 @@
 import { ThemeProvider } from '@/components/theme-provider'
 import { LoadingProvider } from '@/context/loading-context'
-import { setupContextMenu } from '@/lib/owlbear'
 import OBR from '@owlbear-rodeo/sdk'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/(extensions)/_layout')({
   component: Component
@@ -11,11 +10,15 @@ export const Route = createFileRoute('/(extensions)/_layout')({
 
 
 function Component() {
+  const [ready, setReady] = useState(!OBR.isAvailable)
+
   useEffect(() => {
     OBR.onReady(() => {
-      setupContextMenu()
+      setReady(true)
     })
   }, [])
+
+  if (!ready) return null
 
   return (
     <ThemeProvider defaultTheme='dark'>
