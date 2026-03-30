@@ -11,7 +11,7 @@ export const Route = createFileRoute('/(extensions)/_layout')({
 })
 
 function Component() {
-  const [ready, setReady] = useState(() => !OBR.isAvailable)
+  const [ready, setReady] = useState(() => !OBR.isAvailable || OBR.isReady)
 
   useEffect(() => {
     if (!OBR.isAvailable) {
