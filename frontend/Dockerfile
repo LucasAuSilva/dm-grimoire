@@ -21,6 +21,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy built app to nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Expose port
