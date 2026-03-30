@@ -1,3 +1,6 @@
+
+export const PLUGIN_ID = "com.lucassilvadev.dm-grimoire/combat-tracker"
+
 export const COMMON_CONDITIONS = [
   'Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened',
   'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified',

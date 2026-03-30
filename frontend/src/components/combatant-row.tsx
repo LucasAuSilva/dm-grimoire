@@ -94,11 +94,11 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
           {/* Name + conditions */}
           <div className="flex flex-col gap-1 flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className={`font-semibold truncate ${isActive ? 'text-primary' : ''} ${c.currentHp === 0 ? 'line-through opacity-60' : ''}`}>
+              <span className={`font-semibold truncate ${isActive ? 'text-primary' : ''} ${c.currentHp === 0 && c.maxHp !== 0 ? 'line-through opacity-60' : ''}`}>
                 {c.name}
               </span>
               {c.isPlayer && <Badge variant="secondary" className="text-xs py-0">PC</Badge>}
-              {c.currentHp === 0 && (
+              {c.currentHp === 0 && c.maxHp !== 0 && (
                 <Badge variant="outline" className={`text-xs py-0 ${c.isPlayer ? 'border-gray-400 text-gray-400' : 'border-red-700 text-red-600'}`}>
                   {c.isPlayer ? 'Unconscious' : 'Dead'}
                 </Badge>

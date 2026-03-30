@@ -23,12 +23,14 @@ import api from "@/lib/api"
 import { IconChevronDown } from "@tabler/icons-react"
 import { Spinner } from "./ui/spinner"
 import { ScrollArea } from "./ui/scroll-area"
+import { cn } from "@/lib/utils"
 
 interface SearchMonsterCombobox {
   onSelectChange: (value: Monster) => void
+  compact?: boolean
 }
 
-export function SearchMonsterCombobox({ onSelectChange }: SearchMonsterCombobox) {
+export function SearchMonsterCombobox({ onSelectChange, compact = false }: SearchMonsterCombobox) {
   const { isLoading, updateLoading } = useLoadingContext()
   const [selected, setSelected] = React.useState<Monster>()
   const [open, setOpen] = React.useState(false)
@@ -69,7 +71,10 @@ export function SearchMonsterCombobox({ onSelectChange }: SearchMonsterCombobox)
             <IconChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className={`w-100 p-0`}>
+        <PopoverContent className={cn(
+          'w-100 p-0',
+          compact ? "h-12" : "h-72"
+        )}>
           <Command>
             <CommandInput
               placeholder="Search an monster..."
@@ -78,9 +83,13 @@ export function SearchMonsterCombobox({ onSelectChange }: SearchMonsterCombobox)
               }}
             />
             <CommandList
-              className="scroll-auto"
+              className={cn(
+                compact ? "h-20" : "h-72"
+              )}
             >
-            <ScrollArea className="h-72">
+            <ScrollArea className={cn(
+              compact ? "h-20" : "h-72"
+            )}>
               {isLoading
               ? (
                 <CommandLoading>
@@ -89,7 +98,7 @@ export function SearchMonsterCombobox({ onSelectChange }: SearchMonsterCombobox)
               ) : (
                 <CommandEmpty>Not found any monsters</CommandEmpty>
               )}
-                <CommandGroup >
+                <CommandGroup>
                     {data !== undefined ? data?.map((monster) => (
                       <CommandItem
                         key={monster.slug}
@@ -110,7 +119,7 @@ export function SearchMonsterCombobox({ onSelectChange }: SearchMonsterCombobox)
                       </CommandItem>
                     )) : null}
                 </CommandGroup>
-            </ScrollArea>
+              </ScrollArea>
             </CommandList>
           </Command>
         </PopoverContent>

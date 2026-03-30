@@ -13,13 +13,11 @@ import { useCombatLog } from "@/hooks/combat-log"
 import { downloadLog } from "@/utils/combat-utils"
 
 import { createFileRoute } from '@tanstack/react-router'
+import { sortedByIniciative } from "@/lib/utils"
 
 export const Route = createFileRoute('/_main-layout/tracker')({
   component: RouteComponent,
 })
-
-const sorted = (list: Combatant[]) =>
-  [...list].sort((a, b) => b.initiative - a.initiative)
 
 function RouteComponent() {
   const [combatants, setCombatants] = useState<Combatant[]>([])
@@ -30,7 +28,7 @@ function RouteComponent() {
 
   const { startLog, addEvent, endLog } = useCombatLog()
 
-  const order = sorted(combatants)
+  const order = sortedByIniciative(combatants)
 
   const addCombatant = (c: Combatant) =>
     setCombatants(prev => [...prev, c])
