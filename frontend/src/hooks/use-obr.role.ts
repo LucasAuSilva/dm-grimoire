@@ -7,15 +7,9 @@ export function useObrRole() {
   useEffect(() => {
     let unsubscribe: (() => void) | undefined
 
-    if (!OBR.isAvailable) {
-      setRole('GM')
-      return
-    }
-
-    OBR.onReady(async () => {
+    const setup = async () => {
       try {
         const role = await OBR.player.getRole()
-        console.log('[DM Grimoire] player role:', role)
         setRole(role)
 
         unsubscribe = OBR.player.onChange((player) => {
@@ -24,7 +18,20 @@ export function useObrRole() {
       } catch (error) {
         console.error('[DM Grimoire] failed to resolve role', error)
       }
-    })
+    }
+
+    if (!OBR.isAvailable) {
+      setRole('GM')
+      return
+    }
+
+    if (OBR.isReady) {
+      void setup()
+    } else {
+      OBR.onReady(() => {
+        void setup()
+      })
+    }
 
     return () => {
       unsubscribe?.()

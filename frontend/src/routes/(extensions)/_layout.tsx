@@ -9,7 +9,7 @@ export const Route = createFileRoute('/(extensions)/_layout')({
 })
 
 function Component() {
-  const [ready, setReady] = useState(!OBR.isAvailable)
+  const [ready, setReady] = useState(OBR.isReady || !OBR.isAvailable)
 
   useEffect(() => {
     if (!OBR.isAvailable) {
@@ -17,7 +17,12 @@ function Component() {
       return
     }
 
-    OBR.onReady(() => {
+    if (OBR.isReady) {
+      setReady(true)
+      return
+    }
+
+    return OBR.onReady(() => {
       console.log('[DM Grimoire] OBR ready')
       setReady(true)
     })
