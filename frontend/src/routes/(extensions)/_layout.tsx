@@ -9,40 +9,26 @@ export const Route = createFileRoute('/(extensions)/_layout')({
 })
 
 function Component() {
-  const [ready, setReady] = useState(OBR.isReady || !OBR.isAvailable)
+  const [ready, setReady] = useState(() => !OBR.isAvailable || OBR.isReady)
 
   useEffect(() => {
-    if (!OBR.isAvailable) {
-      setReady(true)
-      return
-    }
-
-    if (OBR.isReady) {
-      setReady(true)
-      return
-    }
-
-    return OBR.onReady(() => {
-      console.log('[DM Grimoire] OBR ready')
-      setReady(true)
-    })
-  }, [])
+    OBR.scene.isReady().then(setReady);
+    return OBR.scene.onReadyChange(setReady);
+  }, []);
 
   if (!ready) {
-    return (
-      <div className="p-3 text-sm text-muted-foreground">
-        Loading Owlbear…
-      </div>
-    )
+    return <div className="p-3 text-sm text-muted-foreground">Loading Owlbear…</div>
   }
 
-  return (
-    <ThemeProvider defaultTheme="dark">
-      <LoadingProvider>
-        <div className="p-3">
-          <Outlet />
-        </div>
-      </LoadingProvider>
-    </ThemeProvider>
-  )
+  if (ready) {
+    return (
+      <ThemeProvider defaultTheme="dark">
+        <LoadingProvider>
+          <div className="p-3">
+            <Outlet />
+          </div>
+        </LoadingProvider>
+      </ThemeProvider>
+    )
+  }
 }
