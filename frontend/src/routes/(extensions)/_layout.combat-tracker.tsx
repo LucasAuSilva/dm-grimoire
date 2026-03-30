@@ -10,11 +10,10 @@ import { ImportCharactersDialog } from '@/components/import-characters-dialog'
 
 import { useCombatLog } from '@/hooks/combat-log'
 
-import { downloadLog } from '@/utils/combat-utils'
 import { sortedByIniciative } from '@/lib/utils'
 import type { Combatant, CombatLog } from '@/utils/types'
 
-import { IconChevronsDown, IconDownload, IconPlayerSkipBack, IconPlayerSkipForward } from '@tabler/icons-react'
+import { IconChevronsDown, IconPlayerSkipBack, IconPlayerSkipForward } from '@tabler/icons-react'
 
 import { createFileRoute } from '@tanstack/react-router'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -25,6 +24,7 @@ import { InitiativeDialog } from '@/components/iniciative-dialog'
 import { usePersistedState } from '@/hooks/use-persisted-state'
 import { useObrRole } from '@/hooks/use-obr.role'
 import { goToToken } from '@/lib/owlbear'
+import { DownloadLogDialog } from '@/components/download-log-dialog'
 
 export const Route = createFileRoute('/(extensions)/_layout/combat-tracker')({
   component: RouteComponent,
@@ -203,22 +203,7 @@ function RouteComponent() {
 
           {/* Download last log */}
           {lastLog && !started && (
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  className="gap-1"
-                  onClick={() => downloadLog(lastLog)}
-                >
-                  <IconDownload size={14} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Download combat logs as .md</p>
-              </TooltipContent>
-            </Tooltip>
+            <DownloadLogDialog compact />
           )}
 
           {isGM && combatants.length > 0 && !started && (
