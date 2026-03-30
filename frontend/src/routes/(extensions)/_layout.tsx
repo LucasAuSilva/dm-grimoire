@@ -5,13 +5,14 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import { LoadingProvider } from '@/context/loading-context'
 import { ThemeProvider } from '@/components/theme-provider'
+import { setupContextMenu } from '@/lib/owlbear'
 
 export const Route = createFileRoute('/(extensions)/_layout')({
   component: Component,
 })
 
 function Component() {
-  const [ready, setReady] = useState(() => !OBR.isAvailable || OBR.isReady)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     if (!OBR.isAvailable) {
@@ -19,18 +20,20 @@ function Component() {
       return
     }
 
-    if (OBR.isReady) {
-      setReady(true)
-      return
-    }
-
-    return OBR.onReady(() => {
+    OBR.onReady(() => {
+      setupContextMenu()
       setReady(true)
     })
   }, [])
 
   if (!ready) {
-    return <div className="p-3 text-sm text-muted-foreground">Loading Owlbear…</div>
+    return (
+      <ThemeProvider defaultTheme="dark">
+        <div className="p-3 text-sm text-muted-foreground animate-pulse">
+          Loading Owlbear…
+        </div>
+      </ThemeProvider>
+    )
   }
 
   return (
