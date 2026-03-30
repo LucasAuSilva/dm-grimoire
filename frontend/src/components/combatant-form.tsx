@@ -9,10 +9,12 @@ import { IconPlus, IconUsers } from "@tabler/icons-react"
 import { uid } from "@/utils/helpers"
 import { MultipleAddDialog } from "./multiple-add-dialog"
 import { SearchMonsterDialog } from "./search-monster-dialog"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 interface AddFormProps {
   onAdd: (c: Combatant) => void
   onAddMultiple: (combatants: Combatant[]) => void
+  compact?: boolean
 }
 
 interface CombatantFormData {
@@ -36,7 +38,7 @@ function pickAdjectives(count: number): string[] {
   return shuffled.slice(0, count)
 }
 
-export function CombatantForm({ onAdd, onAddMultiple }: AddFormProps) {
+export function CombatantForm({ onAdd, onAddMultiple, compact = false }: AddFormProps) {
   const [multipleOpen, setMultipleOpen] = useState(false)
   const [multipleCount, setMultipleCount] = useState('2')
 
@@ -64,6 +66,7 @@ export function CombatantForm({ onAdd, onAddMultiple }: AddFormProps) {
       currentHp: Number(data.maxHp) || 0,
       conditions: [],
       isPlayer: data.isPlayer,
+      isHidden: false
     })
     reset()
   }
@@ -83,6 +86,7 @@ export function CombatantForm({ onAdd, onAddMultiple }: AddFormProps) {
       currentHp: Number(data.maxHp) || 0,
       conditions: [],
       isPlayer: false,
+      isHidden: false
     }))
 
     onAddMultiple(combatants)
@@ -126,9 +130,17 @@ export function CombatantForm({ onAdd, onAddMultiple }: AddFormProps) {
             </div>
           </div>
           <div className="flex gap-2 mt-3">
-            <Button type="submit" className="gap-1" size="sm">
-              <IconPlus size={14} /> Add
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button type="submit" className="gap-1" size="sm">
+                  <IconPlus size={14} />
+                  {compact ? "" : " Add"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Add</p>
+              </TooltipContent>
+            </Tooltip>
             {!isPlayer && (
               <>
                 <SearchMonsterDialog
@@ -137,6 +149,7 @@ export function CombatantForm({ onAdd, onAddMultiple }: AddFormProps) {
                     setValue('ac', monster.armor_class)
                     setValue('maxHp', monster.hit_points)
                   }}
+                  compact
                 />
                 <Button
                   type="button"

@@ -1,0 +1,16 @@
+{
+  "name": "DM Grimoire - Combat Tracker",
+  "author": "Lucas Silva",
+  "version": "1.0.0",
+  "manifest_version": 1,
+  "icon": "/dm_grimoire_icon.svg",
+  "description": "Track iniciative, health and conditions on the same tab with this extensions. Also search monsters to autofill details.",
+  "background_url": "/background.html",
+  "action": {
+    "title": "Combat Tracker",
+    "icon": "/shield.svg",
+    "popover": "/combat-tracker",
+    "height": 600,
+    "width": 500
+  }
+}

@@ -1,12 +1,16 @@
+import { useRef, useState } from "react"
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+import { IconUpload, IconPlayerSkipForward } from "@tabler/icons-react"
+
+import { uid } from "@/utils/helpers"
 import type { Combatant } from "@/utils/types"
 
-import { useRef, useState } from "react"
-import { Button } from "./ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
-import { IconUpload, IconPlayerSkipForward } from "@tabler/icons-react"
-import { uid } from "@/utils/helpers"
 
 interface ImportedCharacter {
   name: string
@@ -16,6 +20,7 @@ interface ImportedCharacter {
 
 interface ImportCharactersDialogProps {
   onImport: (combatants: Combatant[]) => void
+  compact?: boolean
 }
 
 // Parse YAML frontmatter from .md content
@@ -35,7 +40,7 @@ function parseFrontmatter(content: string): Record<string, any> {
   return result
 }
 
-export function ImportCharactersDialog({ onImport }: ImportCharactersDialogProps) {
+export function ImportCharactersDialog({ onImport, compact = false }: ImportCharactersDialogProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
   const [characters, setCharacters] = useState<ImportedCharacter[]>([])
@@ -96,24 +101,31 @@ export function ImportCharactersDialog({ onImport }: ImportCharactersDialogProps
 
   return (
     <>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".md"
-        multiple
-        className="hidden"
-        onChange={e => e.target.files && handleFiles(e.target.files)}
-      />
-
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="gap-1"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <IconUpload size={14} /> Import Characters
-      </Button>
+      <Tooltip>
+        <TooltipTrigger>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".md"
+            multiple
+            className="hidden"
+            onChange={e => e.target.files && handleFiles(e.target.files)}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <IconUpload size={14} />
+            {compact ? "" : " Import Characters"}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <p>Import characters from .md</p>
+        </TooltipContent>
+      </Tooltip>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-sm">

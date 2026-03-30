@@ -1,7 +1,8 @@
 import type { CombatLog, LogEvent } from "@/utils/types"
 import { useRef, useCallback } from "react"
 
-const STORAGE_KEY = 'dm_combat_logs'
+const STORAGE_KEY = 'dm-grimoire:dm_combat_logs'
+const MAX_LOGS = 20
 
 export function useCombatLog() {
   const logRef = useRef<CombatLog | null>(null)
@@ -27,7 +28,8 @@ export function useCombatLog() {
     try {
       const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') as CombatLog[]
       existing.push(logRef.current)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(existing))
+      const trimmed = existing.slice(-MAX_LOGS)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed))
     } catch {
       console.error('Failed to save combat log')
     }

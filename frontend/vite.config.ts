@@ -4,9 +4,20 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    cors: {
+      origin: 'https://www.owlbear.rodeo'
+    }
+  },
   plugins: [
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
     react(),
     tailwindcss()
   ],
@@ -15,4 +26,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        backgroud: 'background.html'
+      }
+    }
+  }
 })

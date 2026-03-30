@@ -31,6 +31,7 @@ export interface Combatant {
   maxHp: number
   conditions: Condition[]
   isPlayer: boolean 
+  isHidden: boolean
 }
 
 export interface LogEvent {

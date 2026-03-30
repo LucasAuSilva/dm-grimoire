@@ -6,26 +6,28 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { ModeToggle } from "./mode-toggle"
-import { usePageContext } from "@/context/page-context"
 import { Button } from "./ui/button"
+import { Link } from "@tanstack/react-router"
 
 export function TopBar() {
-  const { changePage } = usePageContext()
-
   return (
     <NavigationMenu>
       <NavigationMenuList className="gap-1">
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Button variant='ghost' className="cursor-pointer" onClick={() => changePage('converter')}>
-              Notes Converter
+            <Button asChild variant='ghost' className="cursor-pointer">
+              <Link to="/converter">
+                Notes Converter
+              </Link>
             </Button>
           </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Button variant='ghost' className="cursor-pointer" onClick={() => changePage('combat')}>
-              Combat Tracker
+            <Button asChild variant='ghost' className="cursor-pointer">
+              <Link to="/tracker">
+                Combat Tracker
+              </Link>
             </Button>
           </NavigationMenuLink>
         </NavigationMenuItem>

@@ -14,9 +14,10 @@ import React from "react"
 
 interface SearchMonsterDialogProps {
   onSelect: (monster: Monster) => void
+  compact?: boolean
 }
 
-export function SearchMonsterDialog({ onSelect }: SearchMonsterDialogProps) {
+export function SearchMonsterDialog({ onSelect, compact = false }: SearchMonsterDialogProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -39,6 +40,7 @@ export function SearchMonsterDialog({ onSelect }: SearchMonsterDialogProps) {
         <SearchMonsterCombobox onSelectChange={(m) => {
           onSelect(m)
           setOpen(false)
+          compact
         }}
         />
       </DialogContent>

@@ -1,3 +1,8 @@
+
+
+export const PLUGIN_ID = "com.lucassilvadev.dm-grimoire"
+export const COMBAT_STATE_KEY = `${PLUGIN_ID}/combat-state`
+
 export const COMMON_CONDITIONS = [
   'Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened',
   'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified',
