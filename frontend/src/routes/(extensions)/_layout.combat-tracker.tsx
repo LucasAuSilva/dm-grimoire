@@ -126,13 +126,16 @@ function RouteComponent() {
     if (clearCombatants) setCombatants([])
   }
 
-  if (isGM) {
-    useEffect(() => {
-      if (autoFollow) {
-        goToToken(order[activeIndex].name)
-      }
-    }, [activeIndex, autoFollow, isGM])
-  }
+  useEffect(() => {
+    if (!isGM) return
+    if (!autoFollow || !started) return
+
+    if (order === undefined || order.length === 0) return
+    const current = order[activeIndex]
+    if (!current?.name) return
+
+    void goToToken(current.name)
+  }, [isGM, autoFollow, started, activeIndex, order])
 
   // Listen for tokens added via context menu
   useEffect(() => {
@@ -270,14 +273,18 @@ function RouteComponent() {
               </span>
             )}
           </div>
-          <Toggle
-            onPressedChange={(value) => {
-              setAutoFollow(value)
-              goToToken(order[activeIndex].name)
-            }}
-          >
-            Auto follow
-          </Toggle>
+          {isGM && (
+            <Toggle
+              onPressedChange={(value) => {
+                setAutoFollow(value)
+                const current = order[activeIndex]
+                if (!current?.name) return
+                  goToToken(order[activeIndex].name)
+              }}
+            >
+              Auto follow
+            </Toggle>
+          )}
         </div>
       )}
 
