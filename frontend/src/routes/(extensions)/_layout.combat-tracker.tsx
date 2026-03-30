@@ -24,12 +24,14 @@ import { usePersistedState } from '@/hooks/use-persisted-state'
 import { useObrRole } from '@/hooks/use-obr.role'
 import { goToToken } from '@/lib/owlbear'
 import { DownloadLogDialog } from '@/components/download-log-dialog'
+import { Toggle } from '@/components/ui/toggle'
 
 export const Route = createFileRoute('/(extensions)/_layout/combat-tracker')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const [autoFollow, setAutoFollow] = useState(false)
   const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(true)
   const [lastLog, setLastLog] = useState<CombatLog | null>(null)
   const [pendingTokens, setPendingTokens] = useState<{ id: string, name: string }[]>([])
@@ -39,7 +41,6 @@ function RouteComponent() {
   const [round, setRound] = usePersistedState<number>('combat-tracker:round', 1)
   const [started, setStarted] = usePersistedState<boolean>('combat-tracker:started', false)
 
-  // role is null while OBR is initializing — wait for it to resolve
   const { role, isGM } = useObrRole()
 
   const { startLog, addEvent, endLog } = useCombatLog()
@@ -123,6 +124,14 @@ function RouteComponent() {
     setStarted(false)
     setIsCollapsibleOpen(true)
     if (clearCombatants) setCombatants([])
+  }
+
+  if (isGM) {
+    useEffect(() => {
+      if (autoFollow) {
+        goToToken(order[activeIndex].name)
+      }
+    }, [activeIndex, autoFollow, isGM])
   }
 
   // Listen for tokens added via context menu
@@ -250,15 +259,25 @@ function RouteComponent() {
       )}
 
       {started && (
-        <div className="flex items-center gap-3 text-sm">
-          <Badge variant="outline" className="text-base font-mono px-3 py-1">
-            Round {round}
-          </Badge>
-          {order[activeIndex] && (
-            <span className="text-muted-foreground">
-              → <span className="text-foreground font-medium">{order[activeIndex].name}</span>
-            </span>
-          )}
+        <div className='flex justify-between'>
+          <div className="flex items-center gap-3 text-sm">
+            <Badge variant="outline" className="text-base font-mono px-3 py-1">
+              Round {round}
+            </Badge>
+            {order[activeIndex] && (
+              <span className="text-muted-foreground">
+                → <span className="text-foreground font-medium">{order[activeIndex].name}</span>
+              </span>
+            )}
+          </div>
+          <Toggle
+            onPressedChange={(value) => {
+              setAutoFollow(value)
+              goToToken(order[activeIndex].name)
+            }}
+          >
+            Auto follow
+          </Toggle>
         </div>
       )}
 

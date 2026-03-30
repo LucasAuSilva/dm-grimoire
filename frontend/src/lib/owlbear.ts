@@ -53,7 +53,7 @@ export async function goToToken(name: string): Promise<boolean> {
  
   const bounds = await OBR.scene.items.getItemBounds([target.id])
  
-  const padding = 600
+  const padding = 800
   await OBR.viewport.animateToBounds({
     min: { x: bounds.min.x - padding, y: bounds.min.y - padding },
     max: { x: bounds.max.x + padding, y: bounds.max.y + padding },
