@@ -66,6 +66,7 @@ export function CombatantForm({ onAdd, onAddMultiple, compact = false }: AddForm
       currentHp: Number(data.maxHp) || 0,
       conditions: [],
       isPlayer: data.isPlayer,
+      isHidden: false
     })
     reset()
   }
@@ -85,6 +86,7 @@ export function CombatantForm({ onAdd, onAddMultiple, compact = false }: AddForm
       currentHp: Number(data.maxHp) || 0,
       conditions: [],
       isPlayer: false,
+      isHidden: false
     }))
 
     onAddMultiple(combatants)

@@ -1,30 +1,31 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-
-import { CombatantRow } from '@/components/combatant-row'
-import { CombatantForm } from '@/components/combatant-form'
-import { ImportCharactersDialog } from '@/components/import-characters-dialog'
-
-import { useCombatLog } from '@/hooks/combat-log'
-
-import { sortedByIniciative } from '@/lib/utils'
-import type { Combatant, CombatLog } from '@/utils/types'
+import OBR from '@owlbear-rodeo/sdk'
+import { createFileRoute } from '@tanstack/react-router'
 
 import { IconChevronsDown, IconPlayerSkipBack, IconPlayerSkipForward } from '@tabler/icons-react'
 
-import { createFileRoute } from '@tanstack/react-router'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import OBR from '@owlbear-rodeo/sdk'
-import { COMBAT_STATE_KEY, PLUGIN_ID } from '@/utils/constants'
-import { InitiativeDialog } from '@/components/iniciative-dialog'
-import { usePersistedState } from '@/hooks/use-persisted-state'
-import { useObrRole } from '@/hooks/use-obr.role'
-import { goToToken } from '@/lib/owlbear'
-import { DownloadLogDialog } from '@/components/download-log-dialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Toggle } from '@/components/ui/toggle'
+import { Separator } from '@/components/ui/separator'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+
+import { CombatantRow } from '@/components/combatant-row'
+import { CombatantForm } from '@/components/combatant-form'
+import { InitiativeDialog } from '@/components/iniciative-dialog'
+import { DownloadLogDialog } from '@/components/download-log-dialog'
+import { ImportCharactersDialog } from '@/components/import-characters-dialog'
+
+import { useObrRole } from '@/hooks/use-obr.role'
+import { useCombatLog } from '@/hooks/combat-log'
+import { usePersistedState } from '@/hooks/use-persisted-state'
+
+import { goToToken } from '@/lib/owlbear'
+import { sortedByIniciative } from '@/lib/utils'
+import type { Combatant, CombatLog } from '@/utils/types'
+import { COMBAT_STATE_KEY, PLUGIN_ID } from '@/utils/constants'
+
 
 export const Route = createFileRoute('/(extensions)/_layout/combat-tracker')({
   component: RouteComponent,

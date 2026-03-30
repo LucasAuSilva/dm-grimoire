@@ -47,6 +47,7 @@ export function InitiativeDialog({ tokens, onConfirm, onClose }: InitiativeDialo
       currentHp: 0,
       conditions: [],
       isPlayer,
+      isHidden: false,
     }
 
     const updatedCollected = [...collected, newCombatant]
@@ -142,7 +143,7 @@ export function InitiativeDialog({ tokens, onConfirm, onClose }: InitiativeDialo
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button
             onClick={confirm}
-            disabled={initiativeInput.trim() === ''}
+            disabled={isNaN(Number(initiativeInput)) || initiativeInput.trim() === ''}
             className="gap-1"
           >
             {isLast ? 'Add to Combat' : <>Next <IconPlayerSkipForward size={14} /></>}
