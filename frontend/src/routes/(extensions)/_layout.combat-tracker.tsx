@@ -190,8 +190,22 @@ function RouteComponent() {
     }
   }, [role, isGM])
 
+  console.log('[DM Grimoire] render', {
+    role,
+    isGM,
+    started,
+    activeIndex,
+    combatants: combatants.length,
+  })
+
   // If role not resolved yet, show nothing
-  if (role === null) return null
+  if (role === null) {
+    return (
+      <div className="p-3 text-sm text-muted-foreground">
+        Loading role…
+      </div>
+    )
+  }
 
   return (
     <Collapsible
@@ -276,11 +290,16 @@ function RouteComponent() {
           </div>
           {isGM && (
             <Toggle
+              pressed={autoFollow}
               onPressedChange={(value) => {
                 setAutoFollow(value)
+
+                if (!value || !started) return
+
                 const current = order[activeIndex]
                 if (!current?.name) return
-                  goToToken(order[activeIndex].name)
+
+                goToToken(current.name)
               }}
             >
               Auto follow

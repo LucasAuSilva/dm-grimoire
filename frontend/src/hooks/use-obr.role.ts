@@ -5,21 +5,30 @@ export function useObrRole() {
   const [role, setRole] = useState<'GM' | 'PLAYER' | null>(null)
 
   useEffect(() => {
+    let unsubscribe: (() => void) | undefined
+
     if (!OBR.isAvailable) {
-      // Not in Owlbear — treat as GM so the full UI shows
       setRole('GM')
       return
     }
 
     OBR.onReady(async () => {
-      const r = await OBR.player.getRole()
-      setRole(r)
+      try {
+        const role = await OBR.player.getRole()
+        console.log('[DM Grimoire] player role:', role)
+        setRole(role)
 
-      // Also subscribe to role changes (e.g. GM hands off to someone else)
-      return OBR.player.onChange(player => {
-        setRole(player.role)
-      })
+        unsubscribe = OBR.player.onChange((player) => {
+          setRole(player.role)
+        })
+      } catch (error) {
+        console.error('[DM Grimoire] failed to resolve role', error)
+      }
     })
+
+    return () => {
+      unsubscribe?.()
+    }
   }, [])
 
   return {
