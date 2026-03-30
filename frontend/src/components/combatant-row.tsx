@@ -15,9 +15,10 @@ interface CombatantRowProps {
   onChange: (updated: Combatant) => void
   onRemove: () => void
   onLog: (event: Omit<LogEvent, 'timestamp'>) => void
+  readonly?: boolean
 }
 
-export function CombatantRow({ combatant: c, isActive, currentRound, onChange, onRemove, onLog }: CombatantRowProps) {
+export function CombatantRow({ combatant: c, isActive, currentRound, onChange, onRemove, onLog, readonly = false }: CombatantRowProps) {
   const [conditionOpen, setConditionOpen] = useState(false)
 
   const addCondition = (condition: Condition) => {
@@ -88,6 +89,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
               max={99}
               className="text-sm"
               onCommit={next => onChange({ ...c, initiative: next })}
+              readonly={readonly}
             />
           </div>
 
@@ -127,6 +129,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
               min={0}
               max={100}
               onCommit={next => onChange({ ...c, ac: next })}
+              readonly={readonly}
             />
           </div>
 
@@ -140,6 +143,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
                 max={c.maxHp}
                 className={hpPercent <= 25 ? 'text-red-400' : hpPercent <= 50 ? 'text-yellow-400' : 'text-green-400'}
                 onCommit={handleHpCommit}
+                readonly={readonly}
               />
               <span className="text-muted-foreground">/</span>
               <EditableField
@@ -149,6 +153,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
                 max={9999}
                 className="text-muted-foreground"
                 onCommit={handleMaxHpCommit}
+                readonly={readonly}
               />
             </div>
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -158,12 +163,16 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
 
           {/* Add condition + remove */}
           <div className="flex gap-1 shrink-0">
-            <Button type="button" variant="ghost" size="icon" className="h-7 w-7" title="Add condition" onClick={() => setConditionOpen(true)}>
-              <IconPlus size={14} />
-            </Button>
-            <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={onRemove}>
-              <IconTrash size={14} />
-            </Button>
+            {!readonly && (
+              <>
+                <Button type="button" variant="ghost" size="icon" className="h-7 w-7" title="Add condition" onClick={() => setConditionOpen(true)}>
+                  <IconPlus size={14} />
+                </Button>
+                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={onRemove}>
+                  <IconTrash size={14} />
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

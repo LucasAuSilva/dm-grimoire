@@ -20,9 +20,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import OBR from '@owlbear-rodeo/sdk'
-import { PLUGIN_ID } from '@/utils/constants'
+import { COMBAT_STATE_KEY, PLUGIN_ID } from '@/utils/constants'
 import { InitiativeDialog } from '@/components/iniciative-dialog'
 import { usePersistedState } from '@/hooks/use-persisted-state'
+import { useObrRole } from '@/hooks/use-obr.role'
 
 export const Route = createFileRoute('/(extensions)/_layout/combat-tracker')({
   component: RouteComponent,
@@ -37,6 +38,8 @@ function RouteComponent() {
   const [activeIndex, setActiveIndex] = usePersistedState<number>('combat-tracker:activeIndex', 0)
   const [round, setRound] = usePersistedState<number>('combat-tracker:round', 1)
   const [started, setStarted] = usePersistedState<boolean>('combat-tracker:started', false)
+
+  const { isGM } = useObrRole()
 
   const { startLog, addEvent, endLog } = useCombatLog()
 
@@ -140,6 +143,36 @@ function RouteComponent() {
     })
   }, [])
 
+  // sync TO room metadata whenever state changes (GM only)
+  useEffect(() => {
+    if (!isGM) return
+    OBR.onReady(() => {
+      OBR.room.setMetadata({
+        [COMBAT_STATE_KEY]: {
+          combatants,
+          activeIndex,
+          round,
+          started,
+        }
+      })
+    })
+  }, [combatants, activeIndex, round, started, isGM])
+
+  // sync FROM room metadata (players)
+  useEffect(() => {
+    if (isGM) return
+    OBR.onReady(() => {
+      return OBR.room.onMetadataChange(metadata => {
+        const state = metadata[COMBAT_STATE_KEY] as any
+        if (!state) return
+        setCombatants(state.combatants ?? [])
+        setActiveIndex(state.activeIndex ?? 0)
+        setRound(state.round ?? 1)
+        setStarted(state.started ?? false)
+      })
+    })
+  }, [isGM])
+
   return (
     <Collapsible
       open={isCollapsibleOpen}
@@ -151,7 +184,7 @@ function RouteComponent() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-semibold">Combat Tracker</h2>
-          {!started && (
+          {isGM && !started && (
             <ImportCharactersDialog onImport={addMultipleCombatants} compact />
           )}
           {pendingTokens.length > 0 && (
@@ -187,12 +220,12 @@ function RouteComponent() {
             </Tooltip>
           )}
 
-          {combatants.length > 0 && !started && (
+          {isGM && combatants.length > 0 && !started && (
             <Button type="button" size="sm" onClick={startCombat}>
               Start Combat
             </Button>
           )}
-          {started && (
+          {isGM && started && (
             <>
               <Button type="button" size="sm" variant="outline" onClick={prev}>
                 <IconPlayerSkipBack size={14} />
@@ -205,23 +238,27 @@ function RouteComponent() {
               </Button>
             </>
           )}
-          {combatants.length > 0 && (
+          {isGM && combatants.length > 0 && (
             <Button type="button" size="sm" variant="destructive" onClick={() => finishCombat(true)}>
               Reset
             </Button>
           )}
-          <CollapsibleTrigger asChild>
-            <Button variant='ghost' size='icon' className='size-8'>
-              <IconChevronsDown />
-            </Button>
-          </CollapsibleTrigger>
+          {isGM && (
+            <CollapsibleTrigger asChild>
+              <Button variant='ghost' size='icon' className='size-8'>
+                <IconChevronsDown />
+              </Button>
+            </CollapsibleTrigger>
+          )}
         </div>
       </div>
 
       <Separator />
-      <CollapsibleContent>
-        <CombatantForm onAdd={addCombatant} onAddMultiple={addMultipleCombatants} compact/>
-      </CollapsibleContent>
+      {isGM && (
+        <CollapsibleContent>
+          <CombatantForm onAdd={addCombatant} onAddMultiple={addMultipleCombatants} compact/>
+        </CollapsibleContent>
+      )}
 
       {started && (
         <div className="flex items-center gap-3 text-sm">
@@ -251,6 +288,7 @@ function RouteComponent() {
               onChange={updateCombatant}
               onRemove={() => removeCombatant(c.id)}
               onLog={addEvent}
+              readOnly={!isGM}
             />
           ))}
         </div>
