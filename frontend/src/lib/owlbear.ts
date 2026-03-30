@@ -1,4 +1,4 @@
-import OBR, { isImage, isLabel, type Image } from '@owlbear-rodeo/sdk'
+import OBR, { type Image } from '@owlbear-rodeo/sdk'
 import { PLUGIN_ID } from '@/utils/constants'
 
 export function setupContextMenu() {
@@ -6,18 +6,22 @@ export function setupContextMenu() {
     id: `${PLUGIN_ID}/add-to-initiative`,
     icons: [
       {
-        icon: '/icon.svg',
-        label: 'Add to Initiative',
+        icon: '/add_iniciative_shield-plus.svg',
+        label: 'Add to Tracker',
         filter: {
           every: [{ key: 'layer', value: 'CHARACTER' }],
         },
       },
     ],
     async onClick(context) {
-      const pending = context.items.map(item => ({
-        id: item.id,
-        name: item.text?.plainText ?? item.name,
-      }))
+      const pending = context.items.map((item) => {
+        if (item.layer === 'CHARACTER') {
+          return {
+            id: item.id,
+            name: (item as Image).text.plainText ?? item.name,
+          }
+        }
+      })
 
       await OBR.room.setMetadata({
         [`${PLUGIN_ID}/pending-initiative`]: pending,
