@@ -12,8 +12,12 @@ function Component() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    OBR.scene.isReady().then(setReady);
-    return OBR.scene.onReadyChange(setReady);
+    if (OBR.isReady) {
+      setReady(true)
+    }
+    return OBR.onReady(() => {
+      setReady(true)
+    })
   }, []);
 
   if (!ready) {
