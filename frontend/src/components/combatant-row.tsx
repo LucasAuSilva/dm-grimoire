@@ -2,11 +2,18 @@ import type { Combatant, Condition, LogEvent } from "@/utils/types"
 
 import { useState } from "react"
 import { Badge } from "./ui/badge"
-import { IconPlus, IconShield, IconTrash } from "@tabler/icons-react"
+import { IconDots, IconShield, IconTrash, IconPlus, IconMapPin } from "@tabler/icons-react"
 import { Button } from "./ui/button"
 import { ConditionBadge } from "./condition-badge"
 import { EditableField } from "./editable-field"
 import { AddConditionDialog } from "./add-condition-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu"
 
 interface CombatantRowProps {
   combatant: Combatant
@@ -16,9 +23,19 @@ interface CombatantRowProps {
   onRemove: () => void
   onLog: (event: Omit<LogEvent, 'timestamp'>) => void
   readonly?: boolean
+  onGoToToken?: (name: string) => void
 }
 
-export function CombatantRow({ combatant: c, isActive, currentRound, onChange, onRemove, onLog, readonly = false }: CombatantRowProps) {
+export function CombatantRow({
+  combatant: c,
+  isActive,
+  currentRound,
+  onChange,
+  onRemove,
+  onLog,
+  readonly = false,
+  onGoToToken,
+}: CombatantRowProps) {
   const [conditionOpen, setConditionOpen] = useState(false)
 
   const addCondition = (condition: Condition) => {
@@ -129,7 +146,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
               min={0}
               max={100}
               onCommit={next => onChange({ ...c, ac: next })}
-              readonly={readonly}
+              readOnly={readonly}
             />
           </div>
 
@@ -143,7 +160,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
                 max={c.maxHp}
                 className={hpPercent <= 25 ? 'text-red-400' : hpPercent <= 50 ? 'text-yellow-400' : 'text-green-400'}
                 onCommit={handleHpCommit}
-                readonly={readonly}
+                readOnly={readonly}
               />
               <span className="text-muted-foreground">/</span>
               <EditableField
@@ -153,7 +170,7 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
                 max={9999}
                 className="text-muted-foreground"
                 onCommit={handleMaxHpCommit}
-                readonly={readonly}
+                readOnly={readonly}
               />
             </div>
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -161,17 +178,39 @@ export function CombatantRow({ combatant: c, isActive, currentRound, onChange, o
             </div>
           </div>
 
-          {/* Add condition + remove */}
+          {/* Actions */}
           <div className="flex gap-1 shrink-0">
             {!readonly && (
-              <>
-                <Button type="button" variant="ghost" size="icon" className="h-7 w-7" title="Add condition" onClick={() => setConditionOpen(true)}>
-                  <IconPlus size={14} />
-                </Button>
-                <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={onRemove}>
-                  <IconTrash size={14} />
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="button" variant="ghost" size="icon" className="h-7 w-7">
+                    <IconDots size={14} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setConditionOpen(true)}>
+                    <IconPlus size={14} className="mr-2" />
+                    Add condition
+                  </DropdownMenuItem>
+                  {onGoToToken && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => onGoToToken(c.name)}>
+                        <IconMapPin size={14} className="mr-2" />
+                        Go to token
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={onRemove}
+                  >
+                    <IconTrash size={14} className="mr-2" />
+                    Remove
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>

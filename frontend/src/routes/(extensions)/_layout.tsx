@@ -1,6 +1,6 @@
 import { ThemeProvider } from '@/components/theme-provider'
 import { LoadingProvider } from '@/context/loading-context'
-import { setupContextMenu } from '@/lib/owlbear-context-menu'
+import { setupContextMenu } from '@/lib/owlbear'
 import OBR from '@owlbear-rodeo/sdk'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { useEffect } from 'react'

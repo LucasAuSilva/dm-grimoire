@@ -24,6 +24,7 @@ import { COMBAT_STATE_KEY, PLUGIN_ID } from '@/utils/constants'
 import { InitiativeDialog } from '@/components/iniciative-dialog'
 import { usePersistedState } from '@/hooks/use-persisted-state'
 import { useObrRole } from '@/hooks/use-obr.role'
+import { goToToken } from '@/lib/owlbear'
 
 export const Route = createFileRoute('/(extensions)/_layout/combat-tracker')({
   component: RouteComponent,
@@ -288,7 +289,8 @@ function RouteComponent() {
               onChange={updateCombatant}
               onRemove={() => removeCombatant(c.id)}
               onLog={addEvent}
-              readOnly={!isGM}
+              readonly={!isGM}
+              onGoToToken={goToToken}
             />
           ))}
         </div>
